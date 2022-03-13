@@ -1,7 +1,7 @@
 package product
 
 import (
-	"github.com/seed95/OrderManagement/Microservice/product-service/internal/model"
+	"github.com/seed95/product-service/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

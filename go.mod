@@ -1,4 +1,4 @@
-module Product
+module github.com/seed95/product-service
 
 go 1.17
 

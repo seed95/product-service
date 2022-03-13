@@ -1,7 +1,7 @@
 package product
 
 import (
-	"github.com/seed95/OrderManagement/Microservice/product-service/internal"
+	"github.com/seed95/product-service/internal"
 )
 
 func NewProductRepoMock() (*productRepo, error) {
