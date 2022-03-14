@@ -7,7 +7,6 @@ import (
 )
 
 func TestProductModelToSchema(t *testing.T) {
-
 	p := model.Product{
 		Id:          101,
 		CompanyName: "Negin",
@@ -25,5 +24,4 @@ func TestProductModelToSchema(t *testing.T) {
 	require.Equal(t, p.DesignCode, gotP.DesignCode)
 	require.Equal(t, len(p.Dimensions), len(gotP.Dimensions))
 	require.Equal(t, len(p.Colors), len(gotP.Themes))
-
 }

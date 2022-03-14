@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestThemeRepo_AddColorsToProduct_Ok(t *testing.T) {
+func TestDimensionRepo_AddDimensionsToProduct_Ok(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -28,25 +28,25 @@ func TestThemeRepo_AddColorsToProduct_Ok(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, p)
 
-	colors := []string{"سبز", "نارنجی", "green"}
-	gotThemes, err := repo.AddColorsToProduct(p.ID, colors)
+	dimensions := []string{"12", "15"}
+	gotDimensions, err := repo.AddDimensionsToProduct(p.ID, dimensions)
 	require.Nil(t, err)
-	require.NotNil(t, gotThemes)
+	require.NotNil(t, gotDimensions)
 }
 
-func TestThemeRepo_AddColorsToProduct_ProductNotExist(t *testing.T) {
+func TestDimensionRepo_AddDimensionsToProduct_ProductNotExist(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	colors := []string{"سبز"}
-	gotThemes, err := repo.AddColorsToProduct(34, colors)
-	require.Nil(t, gotThemes)
+	dimensions := []string{"12"}
+	gotDimensions, err := repo.AddDimensionsToProduct(34, dimensions)
+	require.Nil(t, gotDimensions)
 	require.NotNil(t, err)
 }
 
-func TestThemeRepo_AddColorsToProduct_Duplicate(t *testing.T) {
+func TestDimensionRepo_AddDimensionsToProduct_Duplicate(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -65,23 +65,23 @@ func TestThemeRepo_AddColorsToProduct_Duplicate(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gotP1)
 
-	colors := []string{p1.Colors[0]}
-	gotThemes, err := repo.AddColorsToProduct(gotP1.ID, colors)
-	require.Nil(t, gotThemes)
+	dimensions := []string{p1.Dimensions[0]}
+	gotDimensions, err := repo.AddDimensionsToProduct(gotP1.ID, dimensions)
+	require.Nil(t, gotDimensions)
 	require.NotNil(t, err)
 
 	t.Run("roll back", func(t *testing.T) {
-		colors = []string{"سبز", p1.Colors[0]}
-		gotThemes, err = repo.AddColorsToProduct(gotP1.ID, colors)
-		require.Nil(t, gotThemes)
+		dimensions = []string{"12", p1.Dimensions[0]}
+		gotDimensions, err = repo.AddDimensionsToProduct(gotP1.ID, dimensions)
+		require.Nil(t, gotDimensions)
 		require.NotNil(t, err)
 		gotP1, err = repo.GetProductWithId(gotP1.ID)
-		require.Equal(t, p1.Colors[0], gotP1.Themes[0].Color)
+		require.Equal(t, p1.Dimensions[0], gotP1.Dimensions[0].Size)
 	})
 
 }
 
-func TestThemeRepo_AddColorsToProduct_Empty(t *testing.T) {
+func TestDimensionRepo_AddDimensionsToProduct_Empty(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -100,12 +100,12 @@ func TestThemeRepo_AddColorsToProduct_Empty(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gotP1)
 
-	gotThemes, err := repo.AddColorsToProduct(gotP1.ID, []string{})
-	require.Nil(t, gotThemes)
-	require.Equal(t, derror.InvalidColor, err)
+	gotDimensions, err := repo.AddDimensionsToProduct(gotP1.ID, []string{})
+	require.Nil(t, gotDimensions)
+	require.Equal(t, derror.InvalidDimension, err)
 }
 
-func TestThemeRepo_AddColorsToProduct_Nil(t *testing.T) {
+func TestDimensionRepo_AddDimensionsToProduct_Nil(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -124,12 +124,134 @@ func TestThemeRepo_AddColorsToProduct_Nil(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gotP1)
 
-	gotThemes, err := repo.AddColorsToProduct(gotP1.ID, nil)
-	require.Nil(t, gotThemes)
-	require.Equal(t, derror.InvalidColor, err)
+	gotDimensions, err := repo.AddDimensionsToProduct(gotP1.ID, nil)
+	require.Nil(t, gotDimensions)
+	require.Equal(t, derror.InvalidDimension, err)
 }
 
-func TestThemeRepo_DeleteColorsInProduct_Ok(t *testing.T) {
+func TestDimensionRepo_DeleteDimensionsInProduct_Ok(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی", "سبز"},
+		Dimensions:  []string{"6", "9", "12"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	dimensions := []string{"6", "9"}
+	err = repo.DeleteDimensionsInProduct(gotP1.ID, dimensions)
+	require.Nil(t, err)
+	gotP1, err = repo.GetProductWithId(gotP1.ID)
+	require.Equal(t, 1, len(gotP1.Dimensions))
+	require.Equal(t, p1.Dimensions[2], gotP1.Dimensions[0].Size)
+}
+
+func TestDimensionRepo_DeleteDimensionsInProduct_ProductNotExist(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dimensions := []string{"12"}
+	err = repo.DeleteDimensionsInProduct(34, dimensions)
+	require.Equal(t, err, derror.DimensionNotFound)
+}
+
+func TestDimensionRepo_DeleteDimensionsInProduct_DimensionNotExist(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی"},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	dimensions := []string{"12"}
+	err = repo.DeleteDimensionsInProduct(gotP1.ID, dimensions)
+	require.Equal(t, err, derror.DimensionNotFound)
+
+	dimensions = []string{"12", "6"}
+	err = repo.DeleteDimensionsInProduct(gotP1.ID, dimensions)
+	require.Equal(t, err, derror.DimensionNotFound)
+	gotP1, err = repo.GetProductWithId(gotP1.ID)
+	require.Equal(t, len(p1.Dimensions), len(gotP1.Dimensions))
+
+	t.Run("roll back", func(t *testing.T) {
+		dimensions = []string{"6", "12"}
+		err = repo.DeleteDimensionsInProduct(gotP1.ID, dimensions)
+		require.Equal(t, err, derror.DimensionNotFound)
+		gotP1, err = repo.GetProductWithId(gotP1.ID)
+		require.Equal(t, len(p1.Dimensions), len(gotP1.Dimensions))
+	})
+}
+
+func TestDimensionRepo_DeleteDimensionsInProduct_Empty(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی"},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	err = repo.DeleteDimensionsInProduct(gotP1.ID, []string{})
+	require.Nil(t, err)
+}
+
+func TestDimensionRepo_DeleteDimensionsInProduct_Nil(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی"},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	err = repo.DeleteDimensionsInProduct(gotP1.ID, nil)
+	require.Nil(t, err)
+}
+
+func TestDimensionRepo_UpdateDimensionsWithId_Ok(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -144,144 +266,31 @@ func TestThemeRepo_DeleteColorsInProduct_Ok(t *testing.T) {
 		Dimensions:  []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۵",
 	}
-	p, err := repo.CreateProduct(p1)
-	require.Nil(t, err)
-	require.NotNil(t, p)
-
-	colors := []string{"قرمز", "آبی"}
-	err = repo.DeleteColorsInProduct(p.ID, colors)
-	require.Nil(t, err)
-}
-
-func TestThemeRepo_DeleteColorsInProduct_ProductNotExist(t *testing.T) {
-	repo, err := NewProductRepoMock()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	colors := []string{"سبز"}
-	err = repo.DeleteColorsInProduct(34, colors)
-	require.Equal(t, err, derror.ColorNotFound)
-}
-
-func TestThemeRepo_DeleteColorsInProduct_ColorNotExist(t *testing.T) {
-	repo, err := NewProductRepoMock()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	companyId := uint(1)
-	p1 := model.Product{
-		CompanyName: "Negin",
-		CompanyId:   companyId,
-		DesignCode:  "105",
-		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
-		Description: "توضیحات برای کد ۱۰۵",
-	}
 	gotP1, err := repo.CreateProduct(p1)
 	require.Nil(t, err)
 	require.NotNil(t, gotP1)
 
-	colors := []string{"سبز"}
-	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
-
-	colors = []string{"سبز", "آبی"}
-	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
-	gotP1, err = repo.GetProductWithId(gotP1.ID)
-	require.Equal(t, len(p1.Colors), len(gotP1.Themes))
-
-	colors = []string{"آبی", "سبز"}
-	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
-	gotP1, err = repo.GetProductWithId(gotP1.ID)
-	require.Equal(t, len(p1.Colors), len(gotP1.Themes))
-}
-
-func TestThemeRepo_DeleteColorsInProduct_Empty(t *testing.T) {
-	repo, err := NewProductRepoMock()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	companyId := uint(1)
-	p1 := model.Product{
-		CompanyName: "Negin",
-		CompanyId:   companyId,
-		DesignCode:  "105",
-		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
-		Description: "توضیحات برای کد ۱۰۵",
-	}
-	gotP1, err := repo.CreateProduct(p1)
-	require.Nil(t, err)
-	require.NotNil(t, gotP1)
-
-	err = repo.DeleteColorsInProduct(gotP1.ID, []string{})
-	require.Nil(t, err)
-}
-
-func TestThemeRepo_DeleteColorsInProduct_Nil(t *testing.T) {
-	repo, err := NewProductRepoMock()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	companyId := uint(1)
-	p1 := model.Product{
-		CompanyName: "Negin",
-		CompanyId:   companyId,
-		DesignCode:  "105",
-		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
-		Description: "توضیحات برای کد ۱۰۵",
-	}
-	gotP1, err := repo.CreateProduct(p1)
-	require.Nil(t, err)
-	require.NotNil(t, gotP1)
-
-	err = repo.DeleteColorsInProduct(gotP1.ID, nil)
-	require.Nil(t, err)
-}
-
-func TestThemeRepo_UpdateColorsWithId_Ok(t *testing.T) {
-	repo, err := NewProductRepoMock()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	companyId := uint(1)
-	p1 := model.Product{
-		CompanyName: "Negin",
-		CompanyId:   companyId,
-		DesignCode:  "105",
-		Colors:      []string{"قرمز", "آبی", "سبز"},
-		Dimensions:  []string{"6", "9"},
-		Description: "توضیحات برای کد ۱۰۵",
-	}
-	p, err := repo.CreateProduct(p1)
-	require.Nil(t, err)
-	require.NotNil(t, p)
-
-	themes := []schema.Theme{
+	dimensions := []schema.Dimension{
 		{
-			Model:     gorm.Model{ID: p.Themes[0].ID}, //قرمز
-			ProductId: p.ID,
-			Color:     "نارنجی",
+			Model:     gorm.Model{ID: gotP1.Dimensions[0].ID}, //6
+			ProductId: gotP1.ID,
+			Size:      "12",
 		},
 		{
-			Model:     gorm.Model{ID: p.Themes[2].ID}, //سبز
-			ProductId: p.ID,
-			Color:     "سبز",
+			Model:     gorm.Model{ID: gotP1.Dimensions[1].ID}, //9
+			ProductId: gotP1.ID,
+			Size:      "15",
 		},
 	}
-	err = repo.UpdateColorsWithId(themes)
+	err = repo.UpdateDimensionsWithId(dimensions)
 	require.Nil(t, err)
+	gotP1, err = repo.GetProductWithId(gotP1.ID)
+	require.Equal(t, len(p1.Dimensions), len(gotP1.Dimensions))
+	require.Equal(t, dimensions[0].Size, gotP1.Dimensions[0].Size)
+	require.Equal(t, dimensions[1].Size, gotP1.Dimensions[1].Size)
 }
 
-func TestThemeRepo_UpdateColorsWithId_ProductNotExist(t *testing.T) {
+func TestDimensionRepo_UpdateDimensionsWithId_ProductNotExist(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -300,24 +309,24 @@ func TestThemeRepo_UpdateColorsWithId_ProductNotExist(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, p)
 
-	themes := []schema.Theme{
+	dimensions := []schema.Dimension{
 		{
-			Model:     gorm.Model{ID: p.Themes[0].ID}, //قرمز
+			Model:     gorm.Model{ID: p.Dimensions[0].ID}, //6
 			ProductId: 100,
-			Color:     "نارنجی",
+			Size:      "12",
 		},
 	}
-	err = repo.UpdateColorsWithId(themes)
-	require.NotNil(t, err)
+	err = repo.UpdateDimensionsWithId(dimensions)
+	require.Equal(t, derror.DimensionNotFound, err)
 }
 
-func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
+func TestDimensionRepo_UpdateDimensionsWithId_DimensionNotExist(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Run("one color", func(t *testing.T) {
+	t.Run("one dimension", func(t *testing.T) {
 		companyId := uint(1)
 		p1 := model.Product{
 			CompanyName: "Negin",
@@ -331,18 +340,18 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, gotP1)
 
-		themes := []schema.Theme{
+		dimensions := []schema.Dimension{
 			{
 				Model:     gorm.Model{ID: 100},
 				ProductId: gotP1.ID,
-				Color:     "نارنجی",
+				Size:      "12",
 			},
 		}
-		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		err = repo.UpdateDimensionsWithId(dimensions)
+		require.Equal(t, derror.DimensionNotFound, err)
 	})
 
-	t.Run("two color", func(t *testing.T) {
+	t.Run("two dimension", func(t *testing.T) {
 		companyId := uint(1)
 		p1 := model.Product{
 			CompanyName: "Negin",
@@ -356,22 +365,22 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, gotP1)
 
-		themes := []schema.Theme{
+		dimensions := []schema.Dimension{
 			{
 				Model:     gorm.Model{ID: 100},
 				ProductId: gotP1.ID,
-				Color:     "صورتی",
+				Size:      "5",
 			},
 			{
-				Model:     gorm.Model{ID: gotP1.Themes[0].ID}, //قرمز
+				Model:     gorm.Model{ID: gotP1.Dimensions[0].ID}, //6
 				ProductId: gotP1.ID,
-				Color:     "نارنجی",
+				Size:      "15",
 			},
 		}
-		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		err = repo.UpdateDimensionsWithId(dimensions)
+		require.Equal(t, derror.DimensionNotFound, err)
 		gotP1, err = repo.GetProductWithId(gotP1.ID)
-		require.Equal(t, p1.Colors[0], gotP1.Themes[0].Color)
+		require.Equal(t, p1.Dimensions[0], gotP1.Dimensions[0].Size)
 	})
 
 	t.Run("roll back", func(t *testing.T) {
@@ -388,26 +397,26 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, gotP1)
 
-		themes := []schema.Theme{
+		dimensions := []schema.Dimension{
 			{
-				Model:     gorm.Model{ID: gotP1.Themes[0].ID}, //قرمز
+				Model:     gorm.Model{ID: gotP1.Dimensions[0].ID}, //6
 				ProductId: gotP1.ID,
-				Color:     "نارنجی",
+				Size:      "12",
 			},
 			{
 				Model:     gorm.Model{ID: 100},
 				ProductId: gotP1.ID,
-				Color:     "صورتی",
+				Size:      "15",
 			},
 		}
-		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		err = repo.UpdateDimensionsWithId(dimensions)
+		require.Equal(t, derror.DimensionNotFound, err)
 		gotP1, err = repo.GetProductWithId(gotP1.ID)
-		require.Equal(t, p1.Colors[0], gotP1.Themes[0].Color)
+		require.Equal(t, p1.Dimensions[0], gotP1.Dimensions[0].Size)
 	})
 }
 
-func TestThemeRepo_UpdateColorsWithId_MultiProduct(t *testing.T) {
+func TestDimensionRepo_UpdateDimensionsWithId_MultiProduct(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -438,27 +447,27 @@ func TestThemeRepo_UpdateColorsWithId_MultiProduct(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, gotP2)
 
-	themes := []schema.Theme{
+	dimensions := []schema.Dimension{
 		{
-			Model:     gorm.Model{ID: gotP1.Themes[0].ID}, //قرمز
+			Model:     gorm.Model{ID: gotP1.Dimensions[0].ID}, //6
 			ProductId: gotP1.ID,
-			Color:     "نارنجی",
+			Size:      "نارنجی",
 		},
 		{
-			Model:     gorm.Model{ID: gotP2.Themes[1].ID}, //آبی
+			Model:     gorm.Model{ID: gotP2.Dimensions[1].ID}, //9
 			ProductId: gotP2.ID,
-			Color:     "سبز",
+			Size:      "سبز",
 		},
 	}
-	err = repo.UpdateColorsWithId(themes)
+	err = repo.UpdateDimensionsWithId(dimensions)
 	require.Nil(t, err)
 	gotP1, err = repo.GetProductWithId(gotP1.ID)
-	require.Equal(t, themes[0].Color, gotP1.Themes[0].Color)
+	require.Equal(t, dimensions[0].Size, gotP1.Dimensions[0].Size)
 	gotP2, err = repo.GetProductWithId(gotP2.ID)
-	require.Equal(t, themes[1].Color, gotP2.Themes[1].Color)
+	require.Equal(t, dimensions[1].Size, gotP2.Dimensions[1].Size)
 }
 
-func TestThemeRepo_UpdateColorsWithId_Empty(t *testing.T) {
+func TestDimensionRepo_UpdateDimensionsWithId_Empty(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -477,11 +486,11 @@ func TestThemeRepo_UpdateColorsWithId_Empty(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, p)
 
-	err = repo.UpdateColorsWithId([]schema.Theme{})
+	err = repo.UpdateDimensionsWithId([]schema.Dimension{})
 	require.Nil(t, err)
 }
 
-func TestThemeRepo_UpdateColorsWithId_Nil(t *testing.T) {
+func TestDimensionRepo_UpdateDimensionsWithId_Nil(t *testing.T) {
 	repo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -500,6 +509,6 @@ func TestThemeRepo_UpdateColorsWithId_Nil(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, p)
 
-	err = repo.UpdateColorsWithId(nil)
+	err = repo.UpdateDimensionsWithId(nil)
 	require.Nil(t, err)
 }

@@ -58,9 +58,17 @@ var (
 		message: "color_not_found",
 		code:    http.StatusBadRequest,
 	}
+	DimensionNotFound = serviceError{
+		message: "dimension_not_found",
+		code:    http.StatusBadRequest,
+	}
 
 	InvalidColor = serviceError{
 		message: "invalid_color",
+		code:    http.StatusBadRequest,
+	}
+	InvalidDimension = serviceError{
+		message: "invalid_dimension",
 		code:    http.StatusBadRequest,
 	}
 )
