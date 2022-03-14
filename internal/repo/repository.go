@@ -2,10 +2,26 @@ package repo
 
 import (
 	"github.com/seed95/product-service/internal/model"
+	"github.com/seed95/product-service/internal/repo/product/schema"
 )
 
-type ProductRepo interface {
-	CreateProduct(p *model.Product) (*model.Product, error)
-	GetAllCarpet(companyId uint) ([]model.Carpet, error)
-	DeleteProduct(productId uint) error
-}
+type (
+	ProductRepo interface {
+		CreateProduct(product model.Product) (*schema.Product, error)
+		GetProductWithId(companyId, productId uint) (*schema.Product, error)
+		DeleteProduct(productId uint) error
+		EditProduct(product model.Product) (*model.Product, error)
+		CarpetRepo
+		ThemeRepo
+	}
+
+	CarpetRepo interface {
+		GetAllCarpet(companyId uint) ([]model.Carpet, error)
+		GetAllCarpetWithProductId(companyId, productId uint) ([]model.Carpet, error)
+	}
+
+	ThemeRepo interface {
+		AddColorToProduct(themes []schema.Theme) ([]schema.Theme, error)
+		DeleteColorInProduct(themes []schema.Theme) ([]schema.Theme, error)
+	}
+)

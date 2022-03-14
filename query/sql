@@ -1,0 +1,12 @@
+-- Create carpet view for company
+ SELECT (((('P'::text || COALESCE(p.id::text, '0'::text)) || 'D'::text) || COALESCE(d.id::text, '0'::text)) || 'T'::text) || COALESCE(theme.id::text, '0'::text) AS id,
+    p.id AS product_id,
+    d.id AS dimension_id,
+    theme.id AS theme_id,
+    p.design_code,
+    d.size,
+    theme.color
+   FROM tbl_product p
+     LEFT JOIN tbl_dimension d ON d.product_id = p.id
+     LEFT JOIN tbl_theme theme ON theme.product_id = p.id
+  WHERE p.company_id = 1;

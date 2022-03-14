@@ -50,8 +50,8 @@ var (
 		code:    StatusUnknown,
 	}
 
-	NilProduct = serviceError{
-		message: "nil_product",
+	ProductNotFound = serviceError{
+		message: "product_not_found",
 		code:    http.StatusBadRequest,
 	}
 )

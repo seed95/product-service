@@ -2,10 +2,13 @@ package model
 
 type (
 	Carpet struct {
-		Id         string
-		CompanyId  uint
-		DesignCode string
-		Size       string
-		Color      string
+		Id          string
+		CompanyId   uint
+		ProductId   uint
+		DimensionId uint
+		ThemeId     uint
+		DesignCode  string
+		Dimension   string
+		Color       string
 	}
 )

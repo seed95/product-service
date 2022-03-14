@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"github.com/seed95/product-service/internal/model"
 	"gorm.io/gorm"
 )
@@ -14,55 +15,45 @@ type (
 		Dimensions  []Dimension
 		Themes      []Theme
 	}
-
-	Dimension struct {
-		gorm.Model
-		ProductId uint   `gorm:"uniqueIndex:dimension_unique_id"`
-		Size      string `gorm:"uniqueIndex:dimension_unique_id"`
-	}
-
-	Theme struct {
-		gorm.Model
-		ProductId uint   `gorm:"uniqueIndex:theme_unique_id"`
-		Color     string `gorm:"uniqueIndex:theme_unique_id"`
-	}
 )
 
-func GetProduct(p *model.Product) *Product {
-	return &Product{
-		Model: gorm.Model{
-			ID: p.Id,
-		},
+func ProductModelToSchema(p model.Product) *Product {
+	result := Product{
+		Model:       gorm.Model{ID: p.Id},
 		CompanyId:   p.CompanyId,
 		DesignCode:  p.DesignCode,
 		Description: p.Description,
 	}
-}
 
-func GetDimensions(product *model.Product) []Dimension {
-
-	result := make([]Dimension, len(product.Dimensions))
-
-	for i, d := range product.Dimensions {
-		result[i] = Dimension{
-			ProductId: product.Id,
+	for _, d := range p.Dimensions {
+		result.Dimensions = append(result.Dimensions, Dimension{
+			ProductId: p.Id,
 			Size:      d,
-		}
+		})
 	}
 
-	return result
+	for _, c := range p.Colors {
+		result.Themes = append(result.Themes, Theme{
+			ProductId: p.Id,
+			Color:     c,
+		})
+	}
+
+	return &result
 }
 
-func GetThemes(product *model.Product) []Theme {
+func (p Product) String() string {
 
-	result := make([]Theme, len(product.Colors))
-
-	for i, c := range product.Colors {
-		result[i] = Theme{
-			ProductId: product.Id,
-			Color:     c,
-		}
+	var dimension []string
+	for _, d := range p.Dimensions {
+		dimension = append(dimension, d.Size)
 	}
 
-	return result
+	var theme []string
+	for _, t := range p.Themes {
+		theme = append(theme, t.Color)
+	}
+
+	return fmt.Sprintf("ID: %v,\t CompanyId: %v,\t DesignCode: %v,\t Description: %v,\t Dimensions: %v,\t Theme: %v,\t",
+		p.ID, p.CompanyId, p.DesignCode, p.Description, dimension, theme)
 }
