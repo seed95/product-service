@@ -73,3 +73,13 @@ func (r *productRepo) UpdateDimensionsWithId(dimensions []schema.Dimension) erro
 
 	return nil
 }
+
+// GetDimensionsWithProductId return all dimensions for `productId`
+func (r *productRepo) GetDimensionsWithProductId(productId uint) ([]schema.Dimension, error) {
+	var dimensions []schema.Dimension
+	tx := r.db.Order("id ASC").Model(&schema.Dimension{}).Where("product_id = ?", productId).Find(&dimensions)
+	if err := tx.Error; err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
+	return dimensions, nil
+}

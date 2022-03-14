@@ -41,7 +41,7 @@ func (r *productRepo) DeleteColorsInProduct(productId uint, colors []string) err
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return derror.ColorNotFound
+			return derror.ThemeNotFound
 		}
 		return derror.New(derror.InternalServer, err.Error())
 	}
@@ -66,10 +66,20 @@ func (r *productRepo) UpdateColorsWithId(themes []schema.Theme) error {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return derror.ColorNotFound
+			return derror.ThemeNotFound
 		}
 		return derror.New(derror.InternalServer, err.Error())
 	}
 
 	return nil
+}
+
+// GetThemesWithProductId return all themes for `productId`
+func (r *productRepo) GetThemesWithProductId(productId uint) ([]schema.Theme, error) {
+	var themes []schema.Theme
+	tx := r.db.Order("id ASC").Model(&schema.Theme{}).Where("product_id = ?", productId).Find(&themes)
+	if err := tx.Error; err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
+	return themes, nil
 }

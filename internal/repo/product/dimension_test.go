@@ -512,3 +512,91 @@ func TestDimensionRepo_UpdateDimensionsWithId_Nil(t *testing.T) {
 	err = repo.UpdateDimensionsWithId(nil)
 	require.Nil(t, err)
 }
+
+func TestThemeRepo_GetDimensionsWithProductId_Ok(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی", "سبز"},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotDimensions, err := repo.GetDimensionsWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotDimensions)
+	require.Equal(t, len(gotP1.Dimensions), len(gotDimensions))
+	require.Equal(t, gotP1.Dimensions[0].Size, gotDimensions[0].Size)
+}
+
+func TestThemeRepo_GetDimensionsWithProductId_ProductNotExist(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotDimensions, err := repo.GetDimensionsWithProductId(100)
+	require.Nil(t, err)
+	require.NotNil(t, gotDimensions)
+	require.Equal(t, 0, len(gotDimensions))
+}
+
+func TestThemeRepo_GetDimensionsWithProductId_EmptyDimension(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی", "سبز"},
+		Dimensions:  []string{},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotDimensions, err := repo.GetDimensionsWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotDimensions)
+	require.Equal(t, 0, len(gotDimensions))
+}
+
+func TestThemeRepo_GetDimensionsWithProductId_NilDimension(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی", "سبز"},
+		Dimensions:  nil,
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotDimensions, err := repo.GetDimensionsWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotDimensions)
+	require.Equal(t, 0, len(gotDimensions))
+}

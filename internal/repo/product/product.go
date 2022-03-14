@@ -64,37 +64,41 @@ func (r *productRepo) DeleteProduct(productId uint) error {
 	return nil
 }
 
-func (r *productRepo) EditProduct(product model.Product) (*model.Product, error) {
+func (r *productRepo) EditProduct(editedProduct schema.Product) (*schema.Product, error) {
 
-	//err := r.db.Transaction(func(tx *gorm.DB) error {
-	//
-	//	schemaProduct := schema.GetProduct(&product)
-	//
-	//	if err := tx.Create(schemaProduct).Error; err != nil {
-	//		return derror.New(derror.InternalServer, err.Error())
-	//	}
-	//	product.Id = schemaProduct.ID
-	//
-	//	if len(product.Dimensions) != 0 {
-	//		schemaDimension := schema.GetDimensions(&product)
-	//		if err := tx.Create(schemaDimension).Error; err != nil {
-	//			return derror.New(derror.InternalServer, err.Error())
-	//		}
-	//	}
-	//
-	//	if len(product.Colors) != 0 {
-	//		schemaThemes := schema.GetThemesFromProductModel(&product)
-	//		if err := tx.Create(schemaThemes).Error; err != nil {
-	//			return derror.New(derror.InternalServer, err.Error())
-	//		}
-	//	}
-	//
-	//	return nil
-	//})
-	//
-	//if err != nil {
-	//	return nil, derror.New(derror.InternalServer, err.Error())
-	//}
+	orginalProduct, err := r.GetProductWithId(editedProduct.ID)
+	_ = orginalProduct
+	if err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
+
+	err = r.db.Transaction(func(tx *gorm.DB) error {
+
+		productFields := map[string]interface{}{"design_code": editedProduct.DesignCode, "description": editedProduct.Description}
+		if err := tx.Model(&schema.Product{}).Where("product_id = ?", editedProduct.ID).Updates(productFields).Error; err != nil {
+			return err
+		}
+
+		//if len(product.Dimensions) != 0 {
+		//	schemaDimension := schema.GetDimensions(&product)
+		//	if err := tx.Create(schemaDimension).Error; err != nil {
+		//		return derror.New(derror.InternalServer, err.Error())
+		//	}
+		//}
+		//
+		//if len(product.Colors) != 0 {
+		//	schemaThemes := schema.GetThemesFromProductModel(&product)
+		//	if err := tx.Create(schemaThemes).Error; err != nil {
+		//		return derror.New(derror.InternalServer, err.Error())
+		//	}
+		//}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
 
 	return nil, nil
 }

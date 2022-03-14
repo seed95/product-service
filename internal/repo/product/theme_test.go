@@ -161,7 +161,7 @@ func TestThemeRepo_DeleteColorsInProduct_ProductNotExist(t *testing.T) {
 
 	colors := []string{"سبز"}
 	err = repo.DeleteColorsInProduct(34, colors)
-	require.Equal(t, err, derror.ColorNotFound)
+	require.Equal(t, err, derror.ThemeNotFound)
 }
 
 func TestThemeRepo_DeleteColorsInProduct_ColorNotExist(t *testing.T) {
@@ -185,17 +185,17 @@ func TestThemeRepo_DeleteColorsInProduct_ColorNotExist(t *testing.T) {
 
 	colors := []string{"سبز"}
 	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
+	require.Equal(t, err, derror.ThemeNotFound)
 
 	colors = []string{"سبز", "آبی"}
 	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
+	require.Equal(t, err, derror.ThemeNotFound)
 	gotP1, err = repo.GetProductWithId(gotP1.ID)
 	require.Equal(t, len(p1.Colors), len(gotP1.Themes))
 
 	colors = []string{"آبی", "سبز"}
 	err = repo.DeleteColorsInProduct(gotP1.ID, colors)
-	require.Equal(t, err, derror.ColorNotFound)
+	require.Equal(t, err, derror.ThemeNotFound)
 	gotP1, err = repo.GetProductWithId(gotP1.ID)
 	require.Equal(t, len(p1.Colors), len(gotP1.Themes))
 }
@@ -339,7 +339,7 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 			},
 		}
 		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		require.Equal(t, derror.ThemeNotFound, err)
 	})
 
 	t.Run("two color", func(t *testing.T) {
@@ -369,7 +369,7 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 			},
 		}
 		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		require.Equal(t, derror.ThemeNotFound, err)
 		gotP1, err = repo.GetProductWithId(gotP1.ID)
 		require.Equal(t, p1.Colors[0], gotP1.Themes[0].Color)
 	})
@@ -401,7 +401,7 @@ func TestThemeRepo_UpdateColorsWithId_ColorNotExist(t *testing.T) {
 			},
 		}
 		err = repo.UpdateColorsWithId(themes)
-		require.Equal(t, derror.ColorNotFound, err)
+		require.Equal(t, derror.ThemeNotFound, err)
 		gotP1, err = repo.GetProductWithId(gotP1.ID)
 		require.Equal(t, p1.Colors[0], gotP1.Themes[0].Color)
 	})
@@ -502,4 +502,92 @@ func TestThemeRepo_UpdateColorsWithId_Nil(t *testing.T) {
 
 	err = repo.UpdateColorsWithId(nil)
 	require.Nil(t, err)
+}
+
+func TestThemeRepo_GetThemesWithProductId_Ok(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{"قرمز", "آبی", "سبز"},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotThemes, err := repo.GetThemesWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotThemes)
+	require.Equal(t, len(gotP1.Themes), len(gotThemes))
+	require.Equal(t, gotP1.Themes[0].Color, gotThemes[0].Color)
+}
+
+func TestThemeRepo_GetThemesWithProductId_ProductNotExist(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	gotThemes, err := repo.GetThemesWithProductId(100)
+	require.Nil(t, err)
+	require.NotNil(t, gotThemes)
+	require.Equal(t, 0, len(gotThemes))
+}
+
+func TestThemeRepo_GetThemesWithProductId_EmptyTheme(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      []string{},
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotThemes, err := repo.GetThemesWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotThemes)
+	require.Equal(t, 0, len(gotThemes))
+}
+
+func TestThemeRepo_GetThemesWithProductId_NilTheme(t *testing.T) {
+	repo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	companyId := uint(1)
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   companyId,
+		DesignCode:  "105",
+		Colors:      nil,
+		Dimensions:  []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۵",
+	}
+	gotP1, err := repo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+
+	gotThemes, err := repo.GetThemesWithProductId(gotP1.ID)
+	require.Nil(t, err)
+	require.NotNil(t, gotThemes)
+	require.Equal(t, 0, len(gotThemes))
 }

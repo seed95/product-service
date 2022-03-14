@@ -54,8 +54,8 @@ var (
 		message: "product_not_found",
 		code:    http.StatusBadRequest,
 	}
-	ColorNotFound = serviceError{
-		message: "color_not_found",
+	ThemeNotFound = serviceError{
+		message: "theme_not_found",
 		code:    http.StatusBadRequest,
 	}
 	DimensionNotFound = serviceError{

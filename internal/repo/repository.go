@@ -10,7 +10,7 @@ type (
 		CreateProduct(product model.Product) (*schema.Product, error)
 		GetProductWithId(productId uint) (*schema.Product, error)
 		DeleteProduct(productId uint) error
-		EditProduct(product model.Product) (*model.Product, error)
+		EditProduct(editedProduct schema.Product) (*schema.Product, error)
 		CarpetRepo
 		ThemeRepo
 		DimensionRepo
@@ -25,11 +25,13 @@ type (
 		AddColorsToProduct(productId uint, colors []string) ([]schema.Theme, error)
 		DeleteColorsInProduct(productId uint, colors []string) error
 		UpdateColorsWithId(themes []schema.Theme) error
+		GetThemesWithProductId(productId uint) ([]schema.Theme, error)
 	}
 
 	DimensionRepo interface {
 		AddDimensionsToProduct(productId uint, sizes []string) ([]schema.Dimension, error)
 		DeleteDimensionsInProduct(productId uint, sizes []string) error
 		UpdateDimensionsWithId(dimensions []schema.Dimension) error
+		GetDimensionsWithProductId(productId uint) ([]schema.Dimension, error)
 	}
 )
