@@ -403,7 +403,7 @@ func TestProductRepo_DeleteProduct_Empty(t *testing.T) {
 			DesignCode:  "107",
 			Colors:      []string{},
 			Dimensions:  []string{},
-			Description: "توضیحات برای کد ۱۰۶",
+			Description: "توضیحات برای کد ۱۰۷",
 		}
 
 		p, err := repo.CreateProduct(p1)

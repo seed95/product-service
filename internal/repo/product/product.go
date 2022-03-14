@@ -31,11 +31,11 @@ func (r *productRepo) GetProductWithId(productId uint) (*schema.Product, error) 
 			return err
 		}
 
-		if err := tx.Where("product_id = ?", productId).Find(&product.Dimensions).Error; err != nil {
+		if err := tx.Order("id ASC").Where("product_id = ?", productId).Find(&product.Dimensions).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where("product_id = ?", productId).Find(&product.Themes).Error; err != nil {
+		if err := tx.Order("id ASC").Where("product_id = ?", productId).Find(&product.Themes).Error; err != nil {
 			return err
 		}
 
@@ -54,7 +54,7 @@ func (r *productRepo) GetProductWithId(productId uint) (*schema.Product, error) 
 
 // DeleteProduct soft delete product and relations (associations)
 func (r *productRepo) DeleteProduct(productId uint) error {
-	tx := r.db.Select(clause.Associations).Delete(&schema.Product{Model: gorm.Model{ID: productId}}, productId)
+	tx := r.db.Select(clause.Associations).Delete(&schema.Product{Model: gorm.Model{ID: productId}})
 	if tx.RowsAffected < 1 {
 		return derror.ProductNotFound
 	} else if err := tx.Error; err != nil {

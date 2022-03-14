@@ -23,5 +23,6 @@ type (
 	ThemeRepo interface {
 		AddColorsToProduct(productId uint, colors []string) ([]schema.Theme, error)
 		DeleteColorsInProduct(productId uint, colors []string) error
+		UpdateColorsWithId(themes []schema.Theme) error
 	}
 )

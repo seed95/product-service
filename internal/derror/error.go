@@ -54,6 +54,10 @@ var (
 		message: "product_not_found",
 		code:    http.StatusBadRequest,
 	}
+	ColorNotFound = serviceError{
+		message: "color_not_found",
+		code:    http.StatusBadRequest,
+	}
 )
 
 // Create error message formats
