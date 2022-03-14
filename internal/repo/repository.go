@@ -8,7 +8,7 @@ import (
 type (
 	ProductRepo interface {
 		CreateProduct(product model.Product) (*schema.Product, error)
-		GetProductWithId(companyId, productId uint) (*schema.Product, error)
+		GetProductWithId(productId uint) (*schema.Product, error)
 		DeleteProduct(productId uint) error
 		EditProduct(product model.Product) (*model.Product, error)
 		CarpetRepo
@@ -21,7 +21,7 @@ type (
 	}
 
 	ThemeRepo interface {
-		AddColorToProduct(themes []schema.Theme) ([]schema.Theme, error)
-		DeleteColorInProduct(themes []schema.Theme) ([]schema.Theme, error)
+		AddColorsToProduct(productId uint, colors []string) ([]schema.Theme, error)
+		DeleteColorsInProduct(productId uint, colors []string) error
 	}
 )

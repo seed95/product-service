@@ -1,7 +1,6 @@
 package product
 
 import (
-	"fmt"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo/product/schema"
@@ -249,7 +248,7 @@ func TestProductRepo_GetProductWithId_Ok(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, p)
 
-	gotProduct, err := repo.GetProductWithId(p.CompanyId, p.ID)
+	gotProduct, err := repo.GetProductWithId(p.ID)
 	checkEqualProduct(t, p, gotProduct)
 }
 
@@ -259,7 +258,7 @@ func TestProductRepo_GetProductWithId_NotExist(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	gotProduct, err := repo.GetProductWithId(1, 10)
+	gotProduct, err := repo.GetProductWithId(10)
 	require.Nil(t, gotProduct)
 	require.Equal(t, derror.ProductNotFound, err)
 }
@@ -285,7 +284,7 @@ func TestProductRepo_GetProductWithId_Empty(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, p)
 
-		gotProduct, err := repo.GetProductWithId(p.CompanyId, p.ID)
+		gotProduct, err := repo.GetProductWithId(p.ID)
 		require.Nil(t, err)
 		checkEqualProduct(t, p, gotProduct)
 	})
@@ -305,8 +304,7 @@ func TestProductRepo_GetProductWithId_Empty(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, p)
 
-		gotProduct, err := repo.GetProductWithId(p.CompanyId, p.ID)
-		fmt.Println(gotProduct)
+		gotProduct, err := repo.GetProductWithId(p.ID)
 		checkEqualProduct(t, p, gotProduct)
 	})
 
@@ -325,7 +323,7 @@ func TestProductRepo_GetProductWithId_Empty(t *testing.T) {
 		require.Nil(t, err)
 		require.NotNil(t, p)
 
-		gotProduct, err := repo.GetProductWithId(p.CompanyId, p.ID)
+		gotProduct, err := repo.GetProductWithId(p.ID)
 		require.Nil(t, err)
 		checkEqualProduct(t, p, gotProduct)
 	})

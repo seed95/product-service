@@ -20,10 +20,9 @@ func (r *productRepo) CreateProduct(product model.Product) (*schema.Product, err
 	return schemaProduct, nil
 }
 
-func (r *productRepo) GetProductWithId(companyId, productId uint) (*schema.Product, error) {
+func (r *productRepo) GetProductWithId(productId uint) (*schema.Product, error) {
 	product := schema.Product{
-		Model:     gorm.Model{ID: productId},
-		CompanyId: companyId,
+		Model: gorm.Model{ID: productId},
 	}
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
