@@ -58,6 +58,11 @@ var (
 		message: "color_not_found",
 		code:    http.StatusBadRequest,
 	}
+
+	InvalidColor = serviceError{
+		message: "invalid_color",
+		code:    http.StatusBadRequest,
+	}
 )
 
 // Create error message formats

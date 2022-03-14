@@ -8,6 +8,10 @@ import (
 )
 
 func (r *productRepo) AddColorsToProduct(productId uint, colors []string) ([]schema.Theme, error) {
+	if len(colors) == 0 {
+		return nil, derror.InvalidColor
+	}
+
 	themes := make([]schema.Theme, len(colors))
 	for i, c := range colors {
 		themes[i] = schema.Theme{
