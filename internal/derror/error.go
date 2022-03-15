@@ -67,6 +67,10 @@ var (
 		message: "invalid_color",
 		code:    http.StatusBadRequest,
 	}
+	InvalidTheme = serviceError{
+		message: "invalid_theme",
+		code:    http.StatusBadRequest,
+	}
 	InvalidDimension = serviceError{
 		message: "invalid_dimension",
 		code:    http.StatusBadRequest,

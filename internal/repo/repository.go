@@ -22,10 +22,12 @@ type (
 	}
 
 	ThemeRepo interface {
-		AddColorsToProduct(productId uint, colors []string) ([]schema.Theme, error)
-		DeleteColorsInProduct(productId uint, colors []string) error
-		UpdateColorsWithId(themes []schema.Theme) error
+		AddThemesWithColor(productId uint, colors []string) ([]schema.Theme, error)
+		DeleteThemesWithColor(productId uint, colors []string) error
+		DeleteThemesWithId(productId uint, themeIds []uint) error
+		UpdateThemesWithId(productId uint, themes []schema.Theme) error
 		GetThemesWithProductId(productId uint) ([]schema.Theme, error)
+		EditThemesWithId(productId uint, editedThemes []schema.Theme) error
 	}
 
 	DimensionRepo interface {
