@@ -66,8 +66,8 @@ func (r *productRepo) DeleteProduct(productId uint) error {
 
 func (r *productRepo) EditProduct(editedProduct schema.Product) (*schema.Product, error) {
 
-	orginalProduct, err := r.GetProductWithId(editedProduct.ID)
-	_ = orginalProduct
+	originalProduct, err := r.GetProductWithId(editedProduct.ID)
+	_ = originalProduct
 	if err != nil {
 		return nil, derror.New(derror.InternalServer, err.Error())
 	}

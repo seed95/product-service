@@ -12,22 +12,12 @@ type (
 		DeleteProduct(productId uint) error
 		EditProduct(editedProduct schema.Product) (*schema.Product, error)
 		CarpetRepo
-		ThemeRepo
 		DimensionRepo
 	}
 
 	CarpetRepo interface {
 		GetAllCarpet(companyId uint) ([]model.Carpet, error)
 		GetAllCarpetWithProductId(companyId, productId uint) ([]model.Carpet, error)
-	}
-
-	ThemeRepo interface {
-		AddThemesWithColor(productId uint, colors []string) ([]schema.Theme, error)
-		DeleteThemesWithColor(productId uint, colors []string) error
-		DeleteThemesWithId(productId uint, themeIds []uint) error
-		UpdateThemesWithId(productId uint, themes []schema.Theme) error
-		GetThemesWithProductId(productId uint) ([]schema.Theme, error)
-		EditThemesWithId(productId uint, editedThemes []schema.Theme) error
 	}
 
 	DimensionRepo interface {
