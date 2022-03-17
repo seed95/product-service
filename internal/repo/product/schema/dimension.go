@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"github.com/seed95/product-service/internal/model"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -13,13 +13,6 @@ type (
 	}
 )
 
-func GetDimensionsFromProductModel(product model.Product) []Dimension {
-	result := make([]Dimension, len(product.Dimensions))
-	for i, d := range product.Dimensions {
-		result[i] = Dimension{
-			ProductId: product.Id,
-			Size:      d,
-		}
-	}
-	return result
+func (d Dimension) String() string {
+	return fmt.Sprintf("ID: %v, ProductId: %v, Size: %v", d.ID, d.ProductId, d.Size)
 }

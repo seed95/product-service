@@ -1,13 +1,42 @@
 package product
 
 import (
-	"errors"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/repo/product/schema"
 	"gorm.io/gorm"
 )
 
-func (r *productRepo) AddDimensionsToProduct(productId uint, sizes []string) ([]schema.Dimension, error) {
+type (
+	dimensionRepo struct {
+	}
+
+	DimensionService interface {
+		GetDimensionsWithProductId(db *gorm.DB, productId uint) ([]schema.Dimension, error)
+		InsertDimensions(tx *gorm.DB, productId uint, sizes []string) ([]schema.Dimension, error)
+		DeleteDimensionsWithId(tx *gorm.DB, productId uint, dimensions []schema.Dimension) error
+		EditDimensions(tx *gorm.DB, productId uint, editedSizes []string) ([]schema.Dimension, error)
+	}
+)
+
+var _ DimensionService = (*dimensionRepo)(nil)
+
+func NewDimensionService() DimensionService {
+	return &dimensionRepo{}
+}
+
+// GetDimensionsWithProductId return all dimensions for `productId`
+func (r *dimensionRepo) GetDimensionsWithProductId(db *gorm.DB, productId uint) ([]schema.Dimension, error) {
+	var dimensions []schema.Dimension
+	tx := db.Order("id ASC").Model(&schema.Dimension{}).Where("product_id = ?", productId).Find(&dimensions)
+	if err := tx.Error; err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
+	return dimensions, nil
+}
+
+// InsertDimensions if a size for `productId` is duplicate, no add any dimensions
+// support roll back
+func (r *dimensionRepo) InsertDimensions(tx *gorm.DB, productId uint, sizes []string) ([]schema.Dimension, error) {
 	if len(sizes) == 0 {
 		return nil, derror.InvalidDimension
 	}
@@ -20,66 +49,79 @@ func (r *productRepo) AddDimensionsToProduct(productId uint, sizes []string) ([]
 		}
 	}
 
-	if err := r.db.Create(&dimensions).Error; err != nil {
+	if err := tx.Create(&dimensions).Error; err != nil {
 		return nil, derror.New(derror.InternalServer, err.Error())
 	}
 	return dimensions, nil
 }
 
-func (r *productRepo) DeleteDimensionsInProduct(productId uint, sizes []string) error {
-	err := r.db.Transaction(func(tx *gorm.DB) error {
-		for _, s := range sizes {
-			db := tx.Model(&schema.Dimension{}).Where("product_id = ? AND size = ?", productId, s).Delete(&schema.Dimension{})
-			if db.RowsAffected < 1 {
-				return gorm.ErrRecordNotFound
-			} else if err := db.Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+// DeleteDimensionsWithId delete specific dimension(dimensionIds) for `productId`
+// delete dimension it finds. if a `dimensionId` not found for `productId` do nothing and delete next `dimensionId`
+// if a `dimensionId` not found return derror.DimensionNotFound
+// don't support roll back if not found a `dimensionId`
+func (r *dimensionRepo) DeleteDimensionsWithId(tx *gorm.DB, productId uint, dimensions []schema.Dimension) error {
+	if len(dimensions) == 0 {
+		return derror.InvalidDimension
+	}
 
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return derror.DimensionNotFound
-		}
+	db := tx.Where("product_id = ?", productId).Delete(&dimensions)
+	if db.RowsAffected != int64(len(dimensions)) {
+		return derror.DimensionNotFound
+	} else if err := db.Error; err != nil {
 		return derror.New(derror.InternalServer, err.Error())
 	}
 
 	return nil
 }
 
-// UpdateDimensionsWithId update dimension if exist with dimension_id and product_id
-// can be update dimension for multi product
-func (r *productRepo) UpdateDimensionsWithId(dimensions []schema.Dimension) error {
-	err := r.db.Transaction(func(tx *gorm.DB) error {
-		for _, d := range dimensions {
-			db := tx.Model(&d).Where("product_id = ?", d.ProductId).Update("size", d.Size)
-			if db.RowsAffected < 1 {
-				return gorm.ErrRecordNotFound
-			} else if err := db.Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return derror.DimensionNotFound
-		}
-		return derror.New(derror.InternalServer, err.Error())
+func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedSizes []string) ([]schema.Dimension, error) {
+	if len(editedSizes) == 0 {
+		return nil, derror.InvalidDimension
 	}
 
-	return nil
-}
+	originalDimensions, err := r.GetDimensionsWithProductId(tx, productId)
+	if err != nil {
+		return nil, err
+	}
 
-// GetDimensionsWithProductId return all dimensions for `productId`
-func (r *productRepo) GetDimensionsWithProductId(productId uint) ([]schema.Dimension, error) {
+	var deletedDimensions []schema.Dimension
 	var dimensions []schema.Dimension
-	tx := r.db.Order("id ASC").Model(&schema.Dimension{}).Where("product_id = ?", productId).Find(&dimensions)
-	if err := tx.Error; err != nil {
-		return nil, derror.New(derror.InternalServer, err.Error())
+
+	// Delete dimensions
+OriginalLoop:
+	for _, od := range originalDimensions {
+		for _, s := range editedSizes {
+			if od.Size == s {
+				dimensions = append(dimensions, od)
+				continue OriginalLoop
+			}
+		}
+		deletedDimensions = append(deletedDimensions, od)
 	}
+
+	// New dimensions
+	var newSizes []string
+EditedLoop:
+	for _, s := range editedSizes {
+		for _, od := range originalDimensions {
+			if od.Size == s {
+				continue EditedLoop
+			}
+		}
+		newSizes = append(newSizes, s)
+	}
+
+	err = r.DeleteDimensionsWithId(tx, productId, deletedDimensions)
+	if err != nil {
+		return nil, err
+	}
+
+	newDimensions, err := r.InsertDimensions(tx, productId, newSizes)
+	if err != nil {
+		return nil, err
+	}
+
+	dimensions = append(dimensions, newDimensions...)
 	return dimensions, nil
+
 }

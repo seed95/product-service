@@ -3,6 +3,7 @@ module github.com/seed95/product-service
 go 1.17
 
 require (
+	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/postgres v1.3.1

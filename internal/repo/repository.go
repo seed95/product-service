@@ -12,18 +12,10 @@ type (
 		DeleteProduct(productId uint) error
 		EditProduct(editedProduct schema.Product) (*schema.Product, error)
 		CarpetRepo
-		DimensionRepo
 	}
 
 	CarpetRepo interface {
 		GetAllCarpet(companyId uint) ([]model.Carpet, error)
 		GetAllCarpetWithProductId(companyId, productId uint) ([]model.Carpet, error)
-	}
-
-	DimensionRepo interface {
-		AddDimensionsToProduct(productId uint, sizes []string) ([]schema.Dimension, error)
-		DeleteDimensionsInProduct(productId uint, sizes []string) error
-		UpdateDimensionsWithId(dimensions []schema.Dimension) error
-		GetDimensionsWithProductId(productId uint) ([]schema.Dimension, error)
 	}
 )
