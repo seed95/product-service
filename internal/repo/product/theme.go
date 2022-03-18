@@ -14,7 +14,7 @@ type (
 		GetThemesWithProductId(db *gorm.DB, productId uint) ([]schema.Theme, error)
 		InsertThemesWithColor(tx *gorm.DB, productId uint, colors []string) ([]schema.Theme, error)
 		DeleteThemesWithId(tx *gorm.DB, productId uint, themes []schema.Theme) error
-		EditThemes(tx *gorm.DB, productId uint, themes []schema.Theme) ([]schema.Theme, error)
+		EditThemes(tx *gorm.DB, productId uint, editedThemes []schema.Theme) ([]schema.Theme, error)
 	}
 )
 
@@ -111,16 +111,20 @@ EditedLoop:
 		newColors = append(newColors, et.Color)
 	}
 
-	err = r.DeleteThemesWithId(tx, productId, deletedThemes)
-	if err != nil {
-		return nil, err
+	if len(deletedThemes) != 0 {
+		err = r.DeleteThemesWithId(tx, productId, deletedThemes)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	newThemes, err := r.InsertThemesWithColor(tx, productId, newColors)
-	if err != nil {
-		return nil, err
+	if len(newColors) != 0 {
+		newThemes, err := r.InsertThemesWithColor(tx, productId, newColors)
+		if err != nil {
+			return nil, err
+		}
+		themes = append(themes, newThemes...)
 	}
 
-	themes = append(themes, newThemes...)
 	return themes, nil
 }

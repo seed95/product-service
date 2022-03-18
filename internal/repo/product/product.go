@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// CreateProduct add one row for each size and color of product
+// CreateProduct create a product with relations(dimension, theme)
 func (r *productRepo) CreateProduct(product model.Product) (*schema.Product, error) {
 	schemaProduct := schema.ProductModelToSchema(product)
 
@@ -25,30 +25,12 @@ func (r *productRepo) GetProductWithId(productId uint) (*schema.Product, error) 
 		Model: gorm.Model{ID: productId},
 	}
 
-	err := r.db.Transaction(func(tx *gorm.DB) error {
-
-		if err := tx.First(&product).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Order("id ASC").Where("product_id = ?", productId).Find(&product.Dimensions).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Order("id ASC").Where("product_id = ?", productId).Find(&product.Themes).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	if err != nil {
+	if err := r.db.Preload(clause.Associations).First(&product).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, derror.ProductNotFound
 		}
 		return nil, derror.New(derror.InternalServer, err.Error())
 	}
-
 	return &product, nil
 }
 
@@ -64,34 +46,26 @@ func (r *productRepo) DeleteProduct(productId uint) error {
 	return nil
 }
 
-func (r *productRepo) EditProduct(editedProduct schema.Product) (*schema.Product, error) {
-
-	originalProduct, err := r.GetProductWithId(editedProduct.ID)
-	_ = originalProduct
-	if err != nil {
-		return nil, derror.New(derror.InternalServer, err.Error())
-	}
-
-	err = r.db.Transaction(func(tx *gorm.DB) error {
-
-		productFields := map[string]interface{}{"design_code": editedProduct.DesignCode, "description": editedProduct.Description}
-		if err := tx.Model(&schema.Product{}).Where("product_id = ?", editedProduct.ID).Updates(productFields).Error; err != nil {
+func (r *productRepo) EditProduct(product model.Product) (*schema.Product, error) {
+	schemaProduct := schema.ProductModelToSchema(product)
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		result := tx.Model(schema.Product{Model: gorm.Model{ID: schemaProduct.ID}}).
+			Updates(schema.Product{DesignCode: schemaProduct.DesignCode, Description: schemaProduct.Description})
+		if err := result.Error; err != nil {
 			return err
 		}
 
-		//if len(product.Dimensions) != 0 {
-		//	schemaDimension := schema.GetDimensions(&product)
-		//	if err := tx.Create(schemaDimension).Error; err != nil {
-		//		return derror.New(derror.InternalServer, err.Error())
-		//	}
-		//}
-		//
-		//if len(product.Colors) != 0 {
-		//	schemaThemes := schema.GetThemesFromProductModel(&product)
-		//	if err := tx.Create(schemaThemes).Error; err != nil {
-		//		return derror.New(derror.InternalServer, err.Error())
-		//	}
-		//}
+		themes, err := r.theme.EditThemes(tx, schemaProduct.ID, schemaProduct.Themes)
+		if err != nil {
+			return err
+		}
+		schemaProduct.Themes = themes
+
+		dimensions, err := r.dimension.EditDimensions(tx, schemaProduct.ID, schemaProduct.Dimensions)
+		if err != nil {
+			return err
+		}
+		schemaProduct.Dimensions = dimensions
 
 		return nil
 	})
@@ -100,5 +74,5 @@ func (r *productRepo) EditProduct(editedProduct schema.Product) (*schema.Product
 		return nil, derror.New(derror.InternalServer, err.Error())
 	}
 
-	return nil, nil
+	return schemaProduct, nil
 }

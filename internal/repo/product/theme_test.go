@@ -62,7 +62,7 @@ func TestThemeRepo_GetThemesWithProductId_EmptyTheme(t *testing.T) {
 		CompanyId:   1,
 		DesignCode:  "105",
 		Colors:      []string{},
-		Dimensions:  []string{"6", "9"},
+		Sizes:       []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۵",
 	}
 	gotP1, err := pRepo.CreateProduct(p1)
@@ -92,7 +92,7 @@ func TestThemeRepo_GetThemesWithProductId_NilTheme(t *testing.T) {
 		CompanyId:   companyId,
 		DesignCode:  "105",
 		Colors:      nil,
-		Dimensions:  []string{"6", "9"},
+		Sizes:       []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۵",
 	}
 	gotP1, err := pRepo.CreateProduct(p1)
@@ -396,7 +396,7 @@ func TestThemeRepo_DeleteThemesWithId_Nil(t *testing.T) {
 	require.Equal(t, len(gotP1.Themes), len(gotThemes))
 }
 
-func TestThemeRepo_EditThemesWithId_Ok(t *testing.T) {
+func TestThemeRepo_EditThemes_Ok(t *testing.T) {
 	// Product repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
@@ -426,7 +426,7 @@ func TestThemeRepo_EditThemesWithId_Ok(t *testing.T) {
 	require.Equal(t, len(gotP1.Themes), len(gotThemes))
 }
 
-func TestThemeRepo_EditThemesWithId_ProductNotExist(t *testing.T) {
+func TestThemeRepo_EditThemes_ProductNotExist(t *testing.T) {
 	// Product repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
@@ -439,17 +439,7 @@ func TestThemeRepo_EditThemesWithId_ProductNotExist(t *testing.T) {
 	// Create product
 	gotP1 := CreateProduct1(pRepo, t)
 
-	themes := []schema.Theme{
-		{
-			Color: "آبی",
-		},
-		{
-			Color: "آبی",
-		},
-		{
-			Color: "نارنجی",
-		},
-	}
+	themes := []schema.Theme{{Color: "آبی"}, {Color: "آبی"}, {Color: "نارنجی"}}
 	var gotThemes []schema.Theme
 	err = pRepo.db.Transaction(func(tx *gorm.DB) error {
 		gotThemes, err = tRepo.EditThemes(tx, gotP1.ID+100, themes)
@@ -463,4 +453,27 @@ func TestThemeRepo_EditThemesWithId_ProductNotExist(t *testing.T) {
 	require.NotNil(t, gotThemes)
 	require.Equal(t, len(gotP1.Themes), len(gotThemes))
 	require.Equal(t, gotP1.Themes[0].Color, gotThemes[0].Color)
+}
+
+func TestDimensionRepo_EditThemes_NotChange(t *testing.T) {
+	// Product repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	gotP1 := CreateProduct1(pRepo, t)
+
+	// Theme repo
+	tRepo := NewThemeRepoMock()
+
+	themes := gotP1.Themes
+	var gotThemes []schema.Theme
+	err = pRepo.db.Transaction(func(tx *gorm.DB) error {
+		gotThemes, err = tRepo.EditThemes(tx, gotP1.ID, themes)
+		return err
+	})
+	require.Nil(t, err)
+	require.Equal(t, len(themes), len(gotThemes))
 }

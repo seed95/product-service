@@ -10,7 +10,7 @@ type (
 		CreateProduct(product model.Product) (*schema.Product, error)
 		GetProductWithId(productId uint) (*schema.Product, error)
 		DeleteProduct(productId uint) error
-		EditProduct(editedProduct schema.Product) (*schema.Product, error)
+		EditProduct(product model.Product) (*schema.Product, error)
 		CarpetRepo
 	}
 

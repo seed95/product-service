@@ -21,7 +21,7 @@ package product
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
 //		Colors:      []string{"قرمز", "آبی"},
-//		Dimensions:  []string{"6", "9"},
+//		Sizes:  []string{"6", "9"},
 //		Description: "توضیحات برای کد ۱۰۵",
 //	}
 //
@@ -47,7 +47,7 @@ package product
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
 //		Colors:      []string{},
-//		Dimensions:  []string{"6", "9"},
+//		Sizes:  []string{"6", "9"},
 //		Description: "توضیحات برای کد ۱۰۵",
 //	}
 //
@@ -100,7 +100,7 @@ package product
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
 //		Colors:      []string{"قرمز", "آبی"},
-//		Dimensions:  []string{"6", "9"},
+//		Sizes:  []string{"6", "9"},
 //		Description: "توضیحات برای کد ۱۰۵",
 //	}
 //	p1, err := repo.CreateProduct(p)
@@ -112,7 +112,7 @@ package product
 //		CompanyId:   companyId,
 //		DesignCode:  "106",
 //		Colors:      []string{"قرمز", "آبی"},
-//		Dimensions:  []string{"6", "12", "9"},
+//		Sizes:  []string{"6", "12", "9"},
 //		Description: "توضیحات برای کد ۱۰۶",
 //	}
 //	p2, err := repo.CreateProduct(p)
@@ -121,7 +121,7 @@ package product
 //
 //	carpets, err := repo.GetAllCarpetWithProductId(companyId, p2.Id)
 //	require.Nil(t, err)
-//	require.Equal(t, len(p.Dimensions)*len(p.Colors), len(carpets))
+//	require.Equal(t, len(p.Sizes)*len(p.Colors), len(carpets))
 //}
 //
 //func TestCarpetRepo_GetAllCarpetWithProductId_NotExist(t *testing.T) {
@@ -137,7 +137,7 @@ package product
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
 //		Colors:      []string{"قرمز", "آبی"},
-//		Dimensions:  []string{"6", "9"},
+//		Sizes:  []string{"6", "9"},
 //		Description: "توضیحات برای کد ۱۰۵",
 //	}
 //	p1, err := repo.CreateProduct(p)

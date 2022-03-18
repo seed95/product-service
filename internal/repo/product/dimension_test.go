@@ -62,7 +62,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_EmptyDimension(t *testing.T) {
 		CompanyId:   1,
 		DesignCode:  "105",
 		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{},
+		Sizes:       []string{},
 		Description: "توضیحات برای کد ۱۰۵",
 	}
 	gotP1, err := pRepo.CreateProduct(p1)
@@ -91,7 +91,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_NilDimension(t *testing.T) {
 		CompanyId:   1,
 		DesignCode:  "105",
 		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  nil,
+		Sizes:       nil,
 		Description: "توضیحات برای کد ۱۰۵",
 	}
 	gotP1, err := pRepo.CreateProduct(p1)
@@ -393,7 +393,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_Nil(t *testing.T) {
 	require.Equal(t, len(gotP1.Dimensions), len(gotDimensions))
 }
 
-func TestDimensionRepo_EditDimensionsWithId_Ok(t *testing.T) {
+func TestDimensionRepo_EditDimensions_Ok(t *testing.T) {
 	// Product repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
@@ -406,17 +406,17 @@ func TestDimensionRepo_EditDimensionsWithId_Ok(t *testing.T) {
 	// Dimension repo
 	dRepo := NewDimensionRepoMock()
 
-	sizes := []string{"12", "6", "15"}
+	dimensions := []schema.Dimension{{Size: "12"}, {Size: "6"}, {Size: "15"}}
 	var gotDimensions []schema.Dimension
 	err = pRepo.db.Transaction(func(tx *gorm.DB) error {
-		gotDimensions, err = dRepo.EditDimensions(tx, gotP1.ID, sizes)
+		gotDimensions, err = dRepo.EditDimensions(tx, gotP1.ID, dimensions)
 		return err
 	})
 	require.Nil(t, err)
-	require.Equal(t, len(sizes), len(gotDimensions))
+	require.Equal(t, len(dimensions), len(gotDimensions))
 }
 
-func TestDimensionRepo_EditDimensionsWithId_ProductNotExist(t *testing.T) {
+func TestDimensionRepo_EditDimensions_ProductNotExist(t *testing.T) {
 	// Product repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
@@ -429,10 +429,10 @@ func TestDimensionRepo_EditDimensionsWithId_ProductNotExist(t *testing.T) {
 	// Dimension repo
 	dRepo := NewDimensionRepoMock()
 
-	sizes := []string{"12", "6", "15"}
+	dimensions := []schema.Dimension{{Size: "12"}, {Size: "6"}, {Size: "15"}}
 	var gotDimensions []schema.Dimension
 	err = pRepo.db.Transaction(func(tx *gorm.DB) error {
-		gotDimensions, err = dRepo.EditDimensions(tx, gotP1.ID+100, sizes)
+		gotDimensions, err = dRepo.EditDimensions(tx, gotP1.ID+100, dimensions)
 		return err
 	})
 	require.NotNil(t, err)
@@ -443,4 +443,27 @@ func TestDimensionRepo_EditDimensionsWithId_ProductNotExist(t *testing.T) {
 	require.NotNil(t, gotDimensions)
 	require.Equal(t, len(gotP1.Dimensions), len(gotDimensions))
 	require.Equal(t, gotP1.Dimensions[0].Size, gotDimensions[0].Size)
+}
+
+func TestDimensionRepo_EditDimensions_NotChange(t *testing.T) {
+	// Product repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	gotP1 := CreateProduct1(pRepo, t)
+
+	// Dimension repo
+	dRepo := NewDimensionRepoMock()
+
+	dimensions := gotP1.Dimensions
+	var gotDimensions []schema.Dimension
+	err = pRepo.db.Transaction(func(tx *gorm.DB) error {
+		gotDimensions, err = dRepo.EditDimensions(tx, gotP1.ID, dimensions)
+		return err
+	})
+	require.Nil(t, err)
+	require.Equal(t, len(dimensions), len(gotDimensions))
 }

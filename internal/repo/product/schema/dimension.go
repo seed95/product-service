@@ -16,3 +16,11 @@ type (
 func (d Dimension) String() string {
 	return fmt.Sprintf("ID: %v, ProductId: %v, Size: %v", d.ID, d.ProductId, d.Size)
 }
+
+func GetSizes(dimensions []Dimension) []string {
+	result := make([]string, len(dimensions))
+	for i, d := range dimensions {
+		result[i] = d.Size
+	}
+	return result
+}

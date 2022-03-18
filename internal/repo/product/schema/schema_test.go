@@ -13,7 +13,7 @@ func TestProductModelToSchema(t *testing.T) {
 		CompanyId:   1,
 		DesignCode:  "105",
 		Colors:      []string{""},
-		Dimensions:  []string{"12", "9"},
+		Sizes:       []string{"12", "9"},
 		Description: "توضیحات کد ۱۰۵",
 	}
 
@@ -22,6 +22,6 @@ func TestProductModelToSchema(t *testing.T) {
 	require.Equal(t, p.CompanyId, gotP.CompanyId)
 	require.Equal(t, p.Description, gotP.Description)
 	require.Equal(t, p.DesignCode, gotP.DesignCode)
-	require.Equal(t, len(p.Dimensions), len(gotP.Dimensions))
+	require.Equal(t, len(p.Sizes), len(gotP.Dimensions))
 	require.Equal(t, len(p.Colors), len(gotP.Themes))
 }

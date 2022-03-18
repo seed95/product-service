@@ -14,7 +14,7 @@ type (
 		GetDimensionsWithProductId(db *gorm.DB, productId uint) ([]schema.Dimension, error)
 		InsertDimensions(tx *gorm.DB, productId uint, sizes []string) ([]schema.Dimension, error)
 		DeleteDimensionsWithId(tx *gorm.DB, productId uint, dimensions []schema.Dimension) error
-		EditDimensions(tx *gorm.DB, productId uint, editedSizes []string) ([]schema.Dimension, error)
+		EditDimensions(tx *gorm.DB, productId uint, editedDimensions []schema.Dimension) ([]schema.Dimension, error)
 	}
 )
 
@@ -74,8 +74,8 @@ func (r *dimensionRepo) DeleteDimensionsWithId(tx *gorm.DB, productId uint, dime
 	return nil
 }
 
-func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedSizes []string) ([]schema.Dimension, error) {
-	if len(editedSizes) == 0 {
+func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedDimensions []schema.Dimension) ([]schema.Dimension, error) {
+	if len(editedDimensions) == 0 {
 		return nil, derror.InvalidDimension
 	}
 
@@ -90,8 +90,8 @@ func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedSizes 
 	// Delete dimensions
 OriginalLoop:
 	for _, od := range originalDimensions {
-		for _, s := range editedSizes {
-			if od.Size == s {
+		for _, ed := range editedDimensions {
+			if od.Size == ed.Size {
 				dimensions = append(dimensions, od)
 				continue OriginalLoop
 			}
@@ -102,26 +102,30 @@ OriginalLoop:
 	// New dimensions
 	var newSizes []string
 EditedLoop:
-	for _, s := range editedSizes {
+	for _, ed := range editedDimensions {
 		for _, od := range originalDimensions {
-			if od.Size == s {
+			if od.Size == ed.Size {
 				continue EditedLoop
 			}
 		}
-		newSizes = append(newSizes, s)
+		newSizes = append(newSizes, ed.Size)
 	}
 
-	err = r.DeleteDimensionsWithId(tx, productId, deletedDimensions)
-	if err != nil {
-		return nil, err
+	if len(deletedDimensions) != 0 {
+		err = r.DeleteDimensionsWithId(tx, productId, deletedDimensions)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	newDimensions, err := r.InsertDimensions(tx, productId, newSizes)
-	if err != nil {
-		return nil, err
+	if len(newSizes) != 0 {
+		newDimensions, err := r.InsertDimensions(tx, productId, newSizes)
+		if err != nil {
+			return nil, err
+		}
+		dimensions = append(dimensions, newDimensions...)
 	}
 
-	dimensions = append(dimensions, newDimensions...)
 	return dimensions, nil
 
 }

@@ -15,8 +15,10 @@ import (
 
 type (
 	productRepo struct {
-		db     *gorm.DB
-		config *internal.PostgresConfig
+		db        *gorm.DB
+		config    *internal.PostgresConfig
+		theme     ThemeService
+		dimension DimensionService
 	}
 
 	Setting struct {
@@ -38,6 +40,9 @@ func New(s *Setting) (repo.ProductRepo, error) {
 	if err := productRepo.migration(); err != nil {
 		return nil, err
 	}
+
+	productRepo.theme = NewThemeService()
+	productRepo.dimension = NewDimensionService()
 
 	return productRepo, nil
 }

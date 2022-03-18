@@ -14,7 +14,7 @@ type (
 		CompanyId   uint
 		DesignCode  string
 		Colors      []string
-		Dimensions  []string
+		Sizes       []string
 		Description string
 	}
 )
@@ -39,7 +39,7 @@ func CarpetsToProduct(carpets []Carpet) (*Product, error) {
 	//		return nil, ErrInvalidCarpet
 	//	}
 	//	result.Colors = append(result.Colors, c.Color)
-	//	result.Dimensions = append(result.Dimensions, c.Dimension)
+	//	result.Sizes = append(result.Sizes, c.Dimension)
 	//}
 
 	return &result, nil

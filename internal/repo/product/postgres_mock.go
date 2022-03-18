@@ -28,6 +28,9 @@ func NewProductRepoMock() (*productRepo, error) {
 		return nil, err
 	}
 
+	mock.theme = NewThemeService()
+	mock.dimension = NewDimensionService()
+
 	return &mock, nil
 }
 
@@ -37,7 +40,7 @@ func CreateProduct1(repo *productRepo, t *testing.T) *schema.Product {
 		CompanyId:   1,
 		DesignCode:  "105",
 		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
+		Sizes:       []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۵",
 	}
 	p, err := repo.CreateProduct(p1)
@@ -52,7 +55,7 @@ func CreateProduct2(repo *productRepo, t *testing.T) *schema.Product {
 		CompanyId:   1,
 		DesignCode:  "106",
 		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
+		Sizes:       []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۶",
 	}
 	p, err := repo.CreateProduct(p2)
@@ -67,7 +70,7 @@ func CreateProduct3(repo *productRepo, t *testing.T) *schema.Product {
 		CompanyId:   1,
 		DesignCode:  "107",
 		Colors:      []string{"قرمز", "آبی"},
-		Dimensions:  []string{"6", "9"},
+		Sizes:       []string{"6", "9"},
 		Description: "توضیحات برای کد ۱۰۷",
 	}
 	p, err := repo.CreateProduct(p3)

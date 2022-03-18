@@ -25,7 +25,7 @@ func ProductModelToSchema(p model.Product) *Product {
 		Description: p.Description,
 	}
 
-	for _, d := range p.Dimensions {
+	for _, d := range p.Sizes {
 		result.Dimensions = append(result.Dimensions, Dimension{
 			ProductId: p.Id,
 			Size:      d,
@@ -54,6 +54,6 @@ func (p Product) String() string {
 		theme = append(theme, t.Color)
 	}
 
-	return fmt.Sprintf("ID: %v,\t CompanyId: %v,\t DesignCode: %v,\t Description: %v,\t Dimensions: %v,\t Theme: %v,\t",
+	return fmt.Sprintf("ID: %v,\t CompanyId: %v,\t DesignCode: %v,\t Description: %v,\t Sizes: %v,\t Theme: %v,\t",
 		p.ID, p.CompanyId, p.DesignCode, p.Description, dimension, theme)
 }
