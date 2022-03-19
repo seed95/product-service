@@ -619,6 +619,33 @@ func TestProductRepo_EditProduct_DuplicateDesignCode(t *testing.T) {
 	require.Nil(t, editedProduct)
 }
 
+func TestProductRepo_EditProduct_ProductNotExist(t *testing.T) {
+	// NewProduct repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   1,
+		DesignCode:  "109",
+		Colors:      []string{"قرمز", "آبی"},
+		Sizes:       []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۸",
+	}
+
+	gotP1, err := pRepo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+	p1.Id = gotP1.ID + 100
+
+	editedProduct, err := pRepo.EditProduct(p1)
+	require.NotNil(t, derror.ProductNotFound, err)
+	require.Nil(t, editedProduct)
+}
+
 func TestProductRepo_GetAllProducts_Ok(t *testing.T) {
 	// NewProduct repo
 	pRepo, err := NewProductRepoMock()

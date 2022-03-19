@@ -20,8 +20,8 @@ func NewServiceMock(t *testing.T) ProductService {
 	return service
 }
 
-func GetProduct1() api.Product {
-	return api.Product{
+func GetProduct1() *api.Product {
+	return &api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "105",
@@ -31,8 +31,8 @@ func GetProduct1() api.Product {
 	}
 }
 
-func GetProduct2() api.Product {
-	return api.Product{
+func GetProduct2() *api.Product {
+	return &api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "106",
@@ -42,8 +42,8 @@ func GetProduct2() api.Product {
 	}
 }
 
-func GetProduct3() api.Product {
-	return api.Product{
+func GetProduct3() *api.Product {
+	return &api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "107",

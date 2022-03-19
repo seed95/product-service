@@ -10,13 +10,16 @@ import (
 )
 
 type ProductService interface {
-	CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.CreateNewProductResponse, err error)
+	CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error)
 	GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error)
+	GetProductWithId(ctx context.Context, productId uint) (res *api.GetProductResponse, err error)
+	DeleteProduct(ctx context.Context, productId uint) (err error)
+	EditProduct(ctx context.Context, req *api.EditProductRequest) (res *api.EditProductResponse, err error)
 }
 
 type (
 	gateway struct {
-		productRepo repo.ProductRepo
+		product repo.ProductRepo
 	}
 
 	Setting struct {
@@ -27,45 +30,77 @@ type (
 var _ ProductService = (*gateway)(nil)
 
 func New(s *Setting) (ProductService, error) {
-	return &gateway{productRepo: s.ProductRepo}, nil
+	return &gateway{product: s.ProductRepo}, nil
 
 }
 
-func (g gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.CreateNewProductResponse, err error) {
-	res = &api.CreateNewProductResponse{}
-
-	modelProduct := api.ProductApiToModel(req.NewProduct)
-	if !productIsValid(modelProduct) || modelProduct.Id != 0 {
+func (g *gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error) {
+	modelProduct := api.ProductApiToModel(*req.NewProduct)
+	if !productIsValid(*modelProduct) || modelProduct.Id != 0 {
 		return nil, derror.InvalidProduct
 	}
 
-	_, err = g.productRepo.CreateProduct(modelProduct)
+	_, err = g.product.CreateProduct(*modelProduct)
 	if err != nil {
 		return nil, err
 	}
 
-	allProducts, err := g.productRepo.GetAllProducts(modelProduct.CompanyId)
+	return g.GetAllProducts(ctx, modelProduct.CompanyId)
+}
+
+func (g *gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error) {
+	if companyId == 0 {
+		return nil, derror.InvalidCompany
+	}
+
+	allProducts, err := g.product.GetAllProducts(companyId)
 	if err != nil {
 		return nil, err
 	}
+
+	res = &api.GetAllProductsResponse{}
 	res.Products = make([]api.Product, len(allProducts))
 	for i, p := range allProducts {
-		res.Products[i] = api.ProductSchemaToApi(p)
+		res.Products[i] = *api.ProductSchemaToApi(p)
 	}
 	return res, nil
 }
 
-func (g gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error) {
-	res = &api.GetAllProductsResponse{}
+func (g *gateway) GetProductWithId(ctx context.Context, productId uint) (res *api.GetProductResponse, err error) {
+	if productId == 0 {
+		return nil, derror.InvalidProduct
+	}
 
-	allProducts, err := g.productRepo.GetAllProducts(companyId)
+	schemaProduct, err := g.product.GetProductWithId(productId)
 	if err != nil {
 		return nil, err
 	}
-	res.Products = make([]api.Product, len(allProducts))
-	for i, p := range allProducts {
-		res.Products[i] = api.ProductSchemaToApi(p)
+
+	res = &api.GetProductResponse{}
+	res.Product = api.ProductSchemaToApi(*schemaProduct)
+	return res, nil
+}
+
+func (g *gateway) DeleteProduct(ctx context.Context, productId uint) (err error) {
+	if productId == 0 {
+		return derror.InvalidProduct
 	}
+	return g.product.DeleteProduct(productId)
+}
+
+func (g *gateway) EditProduct(ctx context.Context, req *api.EditProductRequest) (res *api.EditProductResponse, err error) {
+	modelProduct := api.ProductApiToModel(*req.EditedProduct)
+	if !productIsValid(*modelProduct) || modelProduct.Id == 0 {
+		return nil, derror.InvalidProduct
+	}
+
+	editedProduct, err := g.product.EditProduct(*modelProduct)
+	if err != nil {
+		return nil, err
+	}
+
+	res = &api.EditProductResponse{}
+	res.NewProduct = api.ProductSchemaToApi(*editedProduct)
 	return res, nil
 }
 

@@ -48,7 +48,14 @@ func (r *productRepo) DeleteProduct(productId uint) error {
 
 func (r *productRepo) EditProduct(product model.Product) (*schema.Product, error) {
 	schemaProduct := schema.ProductModelToSchema(product)
-	err := r.db.Transaction(func(tx *gorm.DB) error {
+
+	// Check product exist
+	_, err := r.GetProductWithId(schemaProduct.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.db.Transaction(func(tx *gorm.DB) error {
 		result := tx.Model(schema.Product{Model: gorm.Model{ID: schemaProduct.ID}}).
 			Updates(schema.Product{DesignCode: schemaProduct.DesignCode, Description: schemaProduct.Description})
 		if err := result.Error; err != nil {

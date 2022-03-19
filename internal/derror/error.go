@@ -79,6 +79,10 @@ var (
 		message: "invalid_product",
 		code:    http.StatusBadRequest,
 	}
+	InvalidCompany = serviceError{
+		message: "invalid_company",
+		code:    http.StatusBadRequest,
+	}
 )
 
 // Create error message formats

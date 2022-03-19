@@ -15,8 +15,8 @@ type Product struct {
 	Colors      []string `json:"colors"`
 }
 
-func ProductApiToModel(p Product) model.Product {
-	return model.Product{
+func ProductApiToModel(p Product) *model.Product {
+	return &model.Product{
 		Id:          p.Id,
 		CompanyName: p.CompanyName,
 		CompanyId:   p.CompanyId,
@@ -27,11 +27,11 @@ func ProductApiToModel(p Product) model.Product {
 	}
 }
 
-func ProductSchemaToApi(p schema.Product) Product {
-	return Product{
+func ProductSchemaToApi(p schema.Product) *Product {
+	return &Product{
 		Id:          p.ID,
 		CompanyId:   p.CompanyId,
-		CompanyName: "",
+		CompanyName: "", //todo fixme
 		DesignCode:  p.DesignCode,
 		Description: p.Description,
 		Sizes:       schema.GetSizes(p.Dimensions),
@@ -41,7 +41,7 @@ func ProductSchemaToApi(p schema.Product) Product {
 
 type (
 	CreateNewProductRequest struct {
-		NewProduct Product `json:"new_product"`
+		NewProduct *Product `json:"new_product"`
 	}
 
 	CreateNewProductResponse struct {
@@ -51,4 +51,18 @@ type (
 
 type GetAllProductsResponse struct {
 	Products []Product `json:"products"`
+}
+
+type (
+	EditProductRequest struct {
+		EditedProduct *Product `json:"edited_product"`
+	}
+
+	EditProductResponse struct {
+		NewProduct *Product `json:"new_product"`
+	}
+)
+
+type GetProductResponse struct {
+	Product *Product `json:"product"`
 }

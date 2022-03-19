@@ -5,6 +5,7 @@ import (
 	"github.com/seed95/product-service/internal/api"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
+	"github.com/seed95/product-service/internal/repo/product"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -105,6 +106,249 @@ func TestGateway_GetAllProducts_Ok(t *testing.T) {
 	res, err := service.GetAllProducts(ctx, 1)
 	require.Nil(t, err)
 	require.Equal(t, 3, len(res.Products))
+}
+
+func TestGateway_GetAllProducts_NoProduct(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	CreateProduct1(service, t)
+	CreateProduct2(service, t)
+	CreateProduct3(service, t)
+
+	ctx := context.Background()
+	res, err := service.GetAllProducts(ctx, 2)
+	require.Equal(t, derror.ProductNotFound, err)
+	require.Nil(t, res)
+}
+
+func TestGateway_GetAllProducts_ZeroCompanyId(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	CreateProduct1(service, t)
+	CreateProduct2(service, t)
+	CreateProduct3(service, t)
+
+	ctx := context.Background()
+	res, err := service.GetAllProducts(ctx, 0)
+	require.Equal(t, derror.InvalidCompany, err)
+	require.Nil(t, res)
+}
+
+func TestGateway_GetProductWithId_Ok(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+	_ = product.CreateProduct2(pRepo, t)
+
+	ctx := context.Background()
+	res, err := service.GetProductWithId(ctx, gotP1.ID)
+	require.Nil(t, err)
+	require.Equal(t, gotP1.Description, res.Product.Description)
+}
+
+func TestGateway_GetProductWithId_ZeroId(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	_ = product.CreateProduct1(pRepo, t)
+
+	ctx := context.Background()
+	res, err := service.GetProductWithId(ctx, 0)
+	require.Equal(t, derror.InvalidProduct, err)
+	require.Nil(t, res)
+}
+
+func TestGateway_GetProductWithId_ProductNotExist(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+
+	ctx := context.Background()
+	res, err := service.GetProductWithId(ctx, gotP1.ID+100)
+	require.Equal(t, derror.ProductNotFound, err)
+	require.Nil(t, res)
+}
+
+func TestGateway_DeleteProduct_Ok(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+
+	ctx := context.Background()
+	err = service.DeleteProduct(ctx, gotP1.ID)
+	require.Nil(t, err)
+}
+
+func TestGateway_DeleteProduct_ZeroId(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	_ = product.CreateProduct1(pRepo, t)
+
+	ctx := context.Background()
+	err = service.DeleteProduct(ctx, 0)
+	require.Equal(t, derror.InvalidProduct, err)
+}
+
+func TestGateway_DeleteProduct_ProductNotExist(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+
+	ctx := context.Background()
+	err = service.DeleteProduct(ctx, gotP1.ID+100)
+	require.Equal(t, derror.ProductNotFound, err)
+}
+
+func TestGateway_EditProduct_Ok(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+	p1 := GetProduct1()
+	p1.Id = gotP1.ID
+
+	ctx := context.Background()
+
+	t.Run("description", func(t *testing.T) {
+		p1.Description = "عوض شدن توضیحات"
+		req := &api.EditProductRequest{EditedProduct: p1}
+
+		res, err := service.EditProduct(ctx, req)
+		require.Nil(t, err)
+		require.NotNil(t, res)
+
+		getRes, err := service.GetProductWithId(ctx, gotP1.ID)
+		require.Nil(t, err)
+		require.Equal(t, p1.Description, getRes.Product.Description)
+	})
+
+	t.Run("design code", func(t *testing.T) {
+		p1.DesignCode = "106"
+		req := &api.EditProductRequest{EditedProduct: p1}
+
+		res, err := service.EditProduct(ctx, req)
+		require.Nil(t, err)
+		require.NotNil(t, res)
+
+		getRes, err := service.GetProductWithId(ctx, gotP1.ID)
+		require.Nil(t, err)
+		require.Equal(t, p1.DesignCode, getRes.Product.DesignCode)
+	})
+
+	t.Run("size", func(t *testing.T) {
+		p1.Sizes = []string{"12", "8"}
+		req := &api.EditProductRequest{EditedProduct: p1}
+
+		res, err := service.EditProduct(ctx, req)
+		require.Nil(t, err)
+		require.NotNil(t, res)
+
+		getRes, err := service.GetProductWithId(ctx, gotP1.ID)
+		require.Nil(t, err)
+		require.Equal(t, p1.Sizes, getRes.Product.Sizes)
+	})
+
+	t.Run("color", func(t *testing.T) {
+		p1.Colors = []string{"آبی", "صورتی"}
+		req := &api.EditProductRequest{EditedProduct: p1}
+
+		res, err := service.EditProduct(ctx, req)
+		require.Nil(t, err)
+		require.NotNil(t, res)
+
+		getRes, err := service.GetProductWithId(ctx, gotP1.ID)
+		require.Nil(t, err)
+		require.Equal(t, p1.Colors, getRes.Product.Colors)
+	})
+
+}
+
+func TestGateway_EditProduct_NotChange(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+	p1 := GetProduct1()
+	p1.Id = gotP1.ID
+
+	ctx := context.Background()
+	req := &api.EditProductRequest{EditedProduct: p1}
+
+	res, err := service.EditProduct(ctx, req)
+	require.Nil(t, err)
+	require.NotNil(t, res)
+
+	getRes, err := service.GetProductWithId(ctx, gotP1.ID)
+	require.Nil(t, err)
+	require.Equal(t, p1.Description, getRes.Product.Description)
+}
+
+func TestGateway_EditProduct_ProductNotExist(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	// Product repo
+	pRepo, err := product.NewProductRepoMock()
+	require.Nil(t, err)
+
+	// Create product
+	gotP1 := product.CreateProduct1(pRepo, t)
+	p1 := GetProduct1()
+	p1.Id = gotP1.ID + 100
+
+	ctx := context.Background()
+	req := &api.EditProductRequest{EditedProduct: p1}
+
+	res, err := service.EditProduct(ctx, req)
+	require.Equal(t, derror.ProductNotFound, err)
+	require.Nil(t, res)
 }
 
 func TestProductIsValid(t *testing.T) {
