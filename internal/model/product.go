@@ -33,9 +33,9 @@ func CarpetsToProduct(carpets []Carpet) (*Product, error) {
 	//}
 	//
 	//companyId := carpets[0].CompanyId
-	//productId := carpets[0].ProductId
+	//productId := carpets[0].Id
 	//for _, c := range carpets {
-	//	if c.ProductId != productId || c.CompanyId != companyId {
+	//	if c.Id != productId || c.CompanyId != companyId {
 	//		return nil, ErrInvalidCarpet
 	//	}
 	//	result.Colors = append(result.Colors, c.Color)

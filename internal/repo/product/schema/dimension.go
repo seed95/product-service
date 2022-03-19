@@ -14,7 +14,7 @@ type (
 )
 
 func (d Dimension) String() string {
-	return fmt.Sprintf("ID: %v, ProductId: %v, Size: %v", d.ID, d.ProductId, d.Size)
+	return fmt.Sprintf("ID: %v, Id: %v, Size: %v", d.ID, d.ProductId, d.Size)
 }
 
 func GetSizes(dimensions []Dimension) []string {

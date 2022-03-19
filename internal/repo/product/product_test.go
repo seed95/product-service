@@ -9,7 +9,7 @@ import (
 )
 
 func TestProductRepo_CreateProduct_ZeroId(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -28,6 +28,34 @@ func TestProductRepo_CreateProduct_ZeroId(t *testing.T) {
 	p, err := pRepo.CreateProduct(p1)
 	require.Nil(t, err)
 	require.NotNil(t, p)
+	require.NotEqual(t, p1.Id, p.ID)
+	require.Equal(t, p1.Description, p.Description)
+	require.Equal(t, p1.DesignCode, p.DesignCode)
+	require.Equal(t, len(p1.Colors), len(p.Themes))
+	require.Equal(t, len(p1.Sizes), len(p.Dimensions))
+}
+
+func TestProductRepo_CreateProduct_NonZeroId(t *testing.T) {
+	// NewProduct repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p1 := model.Product{
+		Id:          100,
+		CompanyName: "Negin",
+		CompanyId:   1,
+		DesignCode:  "102",
+		Colors:      []string{"آبی", "قرمز"},
+		Sizes:       []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۲",
+	}
+
+	p, err := pRepo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, p)
+	require.Equal(t, p1.Id, p.ID)
 	require.Equal(t, p1.Description, p.Description)
 	require.Equal(t, p1.DesignCode, p.DesignCode)
 	require.Equal(t, len(p1.Colors), len(p.Themes))
@@ -35,7 +63,7 @@ func TestProductRepo_CreateProduct_ZeroId(t *testing.T) {
 }
 
 func TestProductRepo_CreateProduct_Duplicate(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +131,7 @@ func TestProductRepo_CreateProduct_Duplicate(t *testing.T) {
 }
 
 func TestProductRepo_CreateProduct_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -182,7 +210,7 @@ func TestProductRepo_CreateProduct_Empty(t *testing.T) {
 }
 
 func TestProductRepo_CreateProduct_Nil(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -223,7 +251,7 @@ func TestProductRepo_CreateProduct_Nil(t *testing.T) {
 }
 
 func TestProductRepo_GetProductWithId_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -245,7 +273,7 @@ func TestProductRepo_GetProductWithId_Ok(t *testing.T) {
 }
 
 func TestProductRepo_GetProductWithId_NotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -257,7 +285,7 @@ func TestProductRepo_GetProductWithId_NotExist(t *testing.T) {
 }
 
 func TestProductRepo_GetProductWithId_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -325,7 +353,7 @@ func TestProductRepo_GetProductWithId_Empty(t *testing.T) {
 }
 
 func TestProductRepo_DeleteProduct_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -343,7 +371,7 @@ func TestProductRepo_DeleteProduct_Ok(t *testing.T) {
 }
 
 func TestProductRepo_DeleteProduct_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -420,7 +448,7 @@ func TestProductRepo_DeleteProduct_Empty(t *testing.T) {
 }
 
 func TestProductRepo_DeleteProduct_NotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -431,13 +459,14 @@ func TestProductRepo_DeleteProduct_NotExist(t *testing.T) {
 }
 
 func TestProductRepo_EditProduct_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("description", func(t *testing.T) {
+		// Create product
 		p1 := model.Product{
 			CompanyName: "Negin",
 			CompanyId:   1,
@@ -459,6 +488,165 @@ func TestProductRepo_EditProduct_Ok(t *testing.T) {
 		require.Equal(t, p1.Description, editedProduct.Description)
 		require.Equal(t, p1.DesignCode, editedProduct.DesignCode)
 	})
+
+	t.Run("design code", func(t *testing.T) {
+		// Create product
+		p1 := model.Product{
+			CompanyName: "Negin",
+			CompanyId:   1,
+			DesignCode:  "106",
+			Colors:      []string{"قرمز", "آبی"},
+			Sizes:       []string{"6", "9"},
+			Description: "توضیحات برای کد ۱۰۶",
+		}
+
+		gotP1, err := pRepo.CreateProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, gotP1)
+		p1.Id = gotP1.ID
+
+		p1.DesignCode = "107"
+		editedProduct, err := pRepo.EditProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, editedProduct)
+		require.Equal(t, p1.Description, editedProduct.Description)
+		require.Equal(t, p1.DesignCode, editedProduct.DesignCode)
+	})
+
+	t.Run("color", func(t *testing.T) {
+		// Create product
+		p1 := model.Product{
+			CompanyName: "Negin",
+			CompanyId:   1,
+			DesignCode:  "108",
+			Colors:      []string{"قرمز", "آبی"},
+			Sizes:       []string{"6", "9"},
+			Description: "توضیحات برای کد ۱۰۸",
+		}
+
+		gotP1, err := pRepo.CreateProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, gotP1)
+		p1.Id = gotP1.ID
+
+		p1.Colors = []string{"نارنجی", "صورتی", "قرمز"}
+		editedProduct, err := pRepo.EditProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, editedProduct)
+		require.Equal(t, len(p1.Colors), len(editedProduct.Themes))
+	})
+
+	t.Run("size", func(t *testing.T) {
+		// Create product
+		p1 := model.Product{
+			CompanyName: "Negin",
+			CompanyId:   1,
+			DesignCode:  "109",
+			Colors:      []string{"قرمز", "آبی"},
+			Sizes:       []string{"6", "9"},
+			Description: "توضیحات برای کد ۱۰۸",
+		}
+
+		gotP1, err := pRepo.CreateProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, gotP1)
+		p1.Id = gotP1.ID
+
+		p1.Sizes = []string{"15", "8", "6"}
+		editedProduct, err := pRepo.EditProduct(p1)
+		require.Nil(t, err)
+		require.NotNil(t, editedProduct)
+		require.Equal(t, len(p1.Sizes), len(editedProduct.Dimensions))
+	})
+
+}
+
+func TestProductRepo_EditProduct_NotChange(t *testing.T) {
+	// NewProduct repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   1,
+		DesignCode:  "109",
+		Colors:      []string{"قرمز", "آبی"},
+		Sizes:       []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۸",
+	}
+
+	gotP1, err := pRepo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+	p1.Id = gotP1.ID
+
+	editedProduct, err := pRepo.EditProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, editedProduct)
+	require.NotEqual(t, gotP1.UpdatedAt, editedProduct.UpdatedAt)
+}
+
+func TestProductRepo_EditProduct_DuplicateDesignCode(t *testing.T) {
+	// NewProduct repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	p1 := model.Product{
+		CompanyName: "Negin",
+		CompanyId:   1,
+		DesignCode:  "109",
+		Colors:      []string{"قرمز", "آبی"},
+		Sizes:       []string{"6", "9"},
+		Description: "توضیحات برای کد ۱۰۸",
+	}
+
+	gotP1, err := pRepo.CreateProduct(p1)
+	require.Nil(t, err)
+	require.NotNil(t, gotP1)
+	p1.Id = gotP1.ID
+
+	gotP2 := CreateProduct2(pRepo, t)
+
+	p1.DesignCode = gotP2.DesignCode
+	editedProduct, err := pRepo.EditProduct(p1)
+	require.NotNil(t, err)
+	require.Nil(t, editedProduct)
+}
+
+func TestProductRepo_GetAllProducts_Ok(t *testing.T) {
+	// NewProduct repo
+	pRepo, err := NewProductRepoMock()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create product
+	gotP1 := CreateProduct1(pRepo, t)
+	_ = CreateProduct2(pRepo, t)
+	_ = CreateProduct3(pRepo, t)
+
+	p := model.Product{
+		CompanyName: "Almas",
+		CompanyId:   2,
+		DesignCode:  "105",
+		Colors:      []string{"نارنجی"},
+		Sizes:       []string{"12"},
+		Description: "توضیحات ۱۰۵ الماس",
+	}
+	gotP, err := pRepo.CreateProduct(p)
+	require.Nil(t, err)
+	require.NotNil(t, gotP)
+
+	products, err := pRepo.GetAllProducts(gotP1.CompanyId)
+	require.Nil(t, err)
+	require.NotNil(t, products)
+	require.Equal(t, 3, len(products))
 }
 
 func checkEqualProduct(t *testing.T, expectedProduct, gotProduct *schema.Product) {

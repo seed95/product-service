@@ -14,7 +14,7 @@ func NewDimensionRepoMock() DimensionService {
 }
 
 func TestDimensionRepo_GetDimensionsWithProductId_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_Ok(t *testing.T) {
 }
 
 func TestDimensionRepo_GetDimensionsWithProductId_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +50,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_ProductNotExist(t *testing.T) 
 }
 
 func TestDimensionRepo_GetDimensionsWithProductId_EmptyDimension(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +79,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_EmptyDimension(t *testing.T) {
 }
 
 func TestDimensionRepo_GetDimensionsWithProductId_NilDimension(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -108,7 +108,7 @@ func TestDimensionRepo_GetDimensionsWithProductId_NilDimension(t *testing.T) {
 }
 
 func TestDimensionRepo_InsertDimensions_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -138,7 +138,7 @@ func TestDimensionRepo_InsertDimensions_Ok(t *testing.T) {
 }
 
 func TestDimensionRepo_InsertDimensions_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +158,7 @@ func TestDimensionRepo_InsertDimensions_ProductNotExist(t *testing.T) {
 }
 
 func TestDimensionRepo_InsertDimensions_Duplicate(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -203,7 +203,7 @@ func TestDimensionRepo_InsertDimensions_Duplicate(t *testing.T) {
 }
 
 func TestDimensionRepo_InsertDimensions_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -230,7 +230,7 @@ func TestDimensionRepo_InsertDimensions_Empty(t *testing.T) {
 }
 
 func TestDimensionRepo_InsertDimensions_Nil(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -257,7 +257,7 @@ func TestDimensionRepo_InsertDimensions_Nil(t *testing.T) {
 }
 
 func TestDimensionRepo_DeleteDimensionsWithId_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -285,7 +285,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_Ok(t *testing.T) {
 }
 
 func TestDimensionRepo_DeleteDimensionsWithId_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -302,7 +302,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_ProductNotExist(t *testing.T) {
 }
 
 func TestDimensionRepo_DeleteDimensionsWithId_DimensionNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -346,7 +346,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_DimensionNotExist(t *testing.T) {
 }
 
 func TestDimensionRepo_DeleteDimensionsWithId_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -370,7 +370,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_Empty(t *testing.T) {
 }
 
 func TestDimensionRepo_DeleteDimensionsWithId_Nil(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -394,7 +394,7 @@ func TestDimensionRepo_DeleteDimensionsWithId_Nil(t *testing.T) {
 }
 
 func TestDimensionRepo_EditDimensions_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -417,7 +417,7 @@ func TestDimensionRepo_EditDimensions_Ok(t *testing.T) {
 }
 
 func TestDimensionRepo_EditDimensions_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -446,7 +446,7 @@ func TestDimensionRepo_EditDimensions_ProductNotExist(t *testing.T) {
 }
 
 func TestDimensionRepo_EditDimensions_NotChange(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)

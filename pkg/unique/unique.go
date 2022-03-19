@@ -29,3 +29,16 @@ func String(s []string) []string {
 	}
 	return result
 }
+
+func StringsAreUnique(s []string) bool {
+	keys := make(map[string]bool)
+	for _, entry := range s {
+		_, ok := keys[entry]
+		if ok {
+			return false
+		} else {
+			keys[entry] = true
+		}
+	}
+	return true
+}

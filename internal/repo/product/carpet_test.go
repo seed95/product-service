@@ -16,7 +16,7 @@ package product
 //
 //	companyId := uint(1)
 //
-//	p1 := model.Product{
+//	p1 := model.NewProduct{
 //		CompanyName: "Negin",
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
@@ -42,7 +42,7 @@ package product
 //
 //	companyId := uint(1)
 //
-//	p1 := model.Product{
+//	p1 := model.NewProduct{
 //		CompanyName: "Negin",
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
@@ -95,7 +95,7 @@ package product
 //
 //	companyId := uint(1)
 //
-//	p := model.Product{
+//	p := model.NewProduct{
 //		CompanyName: "Negin",
 //		CompanyId:   companyId,
 //		DesignCode:  "105",
@@ -107,7 +107,7 @@ package product
 //	require.Nil(t, err)
 //	require.NotNil(t, p1)
 //
-//	p = model.Product{
+//	p = model.NewProduct{
 //		CompanyName: "Negin",
 //		CompanyId:   companyId,
 //		DesignCode:  "106",
@@ -132,7 +132,7 @@ package product
 //
 //	companyId := uint(1)
 //
-//	p := model.Product{
+//	p := model.NewProduct{
 //		CompanyName: "Negin",
 //		CompanyId:   companyId,
 //		DesignCode:  "105",

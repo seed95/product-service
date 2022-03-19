@@ -76,3 +76,16 @@ func (r *productRepo) EditProduct(product model.Product) (*schema.Product, error
 
 	return schemaProduct, nil
 }
+
+func (r *productRepo) GetAllProducts(companyId uint) ([]schema.Product, error) {
+	var products []schema.Product
+
+	tx := r.db.Model(&schema.Product{}).Preload(clause.Associations).Where("company_id = ?", companyId).Find(&products)
+	if tx.RowsAffected < 1 {
+		return nil, derror.ProductNotFound
+	} else if err := tx.Error; err != nil {
+		return nil, derror.New(derror.InternalServer, err.Error())
+	}
+
+	return products, nil
+}

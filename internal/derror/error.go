@@ -75,6 +75,10 @@ var (
 		message: "invalid_dimension",
 		code:    http.StatusBadRequest,
 	}
+	InvalidProduct = serviceError{
+		message: "invalid_product",
+		code:    http.StatusBadRequest,
+	}
 )
 
 // Create error message formats

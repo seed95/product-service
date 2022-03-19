@@ -11,6 +11,7 @@ type (
 		GetProductWithId(productId uint) (*schema.Product, error)
 		DeleteProduct(productId uint) error
 		EditProduct(product model.Product) (*schema.Product, error)
+		GetAllProducts(companyId uint) ([]schema.Product, error)
 		CarpetRepo
 	}
 

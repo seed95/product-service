@@ -14,5 +14,13 @@ type (
 )
 
 func (t Theme) String() string {
-	return fmt.Sprintf("ID: %v, ProductId: %v, Color: %v", t.ID, t.ProductId, t.Color)
+	return fmt.Sprintf("ID: %v, Id: %v, Color: %v", t.ID, t.ProductId, t.Color)
+}
+
+func GetColors(themes []Theme) []string {
+	result := make([]string, len(themes))
+	for i, t := range themes {
+		result[i] = t.Color
+	}
+	return result
 }

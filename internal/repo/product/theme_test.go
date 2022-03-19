@@ -14,7 +14,7 @@ func NewThemeRepoMock() ThemeService {
 }
 
 func TestThemeRepo_GetThemesWithProductId_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,7 @@ func TestThemeRepo_GetThemesWithProductId_Ok(t *testing.T) {
 }
 
 func TestThemeRepo_GetThemesWithProductId_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -50,7 +50,7 @@ func TestThemeRepo_GetThemesWithProductId_ProductNotExist(t *testing.T) {
 }
 
 func TestThemeRepo_GetThemesWithProductId_EmptyTheme(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +79,7 @@ func TestThemeRepo_GetThemesWithProductId_EmptyTheme(t *testing.T) {
 }
 
 func TestThemeRepo_GetThemesWithProductId_NilTheme(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +109,7 @@ func TestThemeRepo_GetThemesWithProductId_NilTheme(t *testing.T) {
 }
 
 func TestThemeRepo_InsertThemesWithColor_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -139,7 +139,7 @@ func TestThemeRepo_InsertThemesWithColor_Ok(t *testing.T) {
 }
 
 func TestThemeRepo_InsertThemesWithColor_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -159,7 +159,7 @@ func TestThemeRepo_InsertThemesWithColor_ProductNotExist(t *testing.T) {
 }
 
 func TestThemeRepo_InsertThemesWithColor_Duplicate(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -204,7 +204,7 @@ func TestThemeRepo_InsertThemesWithColor_Duplicate(t *testing.T) {
 }
 
 func TestThemeRepo_InsertThemesWithColor_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -231,7 +231,7 @@ func TestThemeRepo_InsertThemesWithColor_Empty(t *testing.T) {
 }
 
 func TestThemeRepo_InsertThemesWithColor_Nil(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -258,7 +258,7 @@ func TestThemeRepo_InsertThemesWithColor_Nil(t *testing.T) {
 }
 
 func TestThemeRepo_DeleteThemesWithId_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -286,7 +286,7 @@ func TestThemeRepo_DeleteThemesWithId_Ok(t *testing.T) {
 }
 
 func TestThemeRepo_DeleteThemesWithId_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -305,7 +305,7 @@ func TestThemeRepo_DeleteThemesWithId_ProductNotExist(t *testing.T) {
 }
 
 func TestThemeRepo_DeleteThemesWithId_ThemeNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -349,7 +349,7 @@ func TestThemeRepo_DeleteThemesWithId_ThemeNotExist(t *testing.T) {
 }
 
 func TestThemeRepo_DeleteThemesWithId_Empty(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -373,7 +373,7 @@ func TestThemeRepo_DeleteThemesWithId_Empty(t *testing.T) {
 }
 
 func TestThemeRepo_DeleteThemesWithId_Nil(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -397,7 +397,7 @@ func TestThemeRepo_DeleteThemesWithId_Nil(t *testing.T) {
 }
 
 func TestThemeRepo_EditThemes_Ok(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -427,7 +427,7 @@ func TestThemeRepo_EditThemes_Ok(t *testing.T) {
 }
 
 func TestThemeRepo_EditThemes_ProductNotExist(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
@@ -456,7 +456,7 @@ func TestThemeRepo_EditThemes_ProductNotExist(t *testing.T) {
 }
 
 func TestDimensionRepo_EditThemes_NotChange(t *testing.T) {
-	// Product repo
+	// NewProduct repo
 	pRepo, err := NewProductRepoMock()
 	if err != nil {
 		t.Fatal(err)
