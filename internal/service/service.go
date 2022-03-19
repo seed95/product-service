@@ -11,6 +11,7 @@ import (
 
 type ProductService interface {
 	CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.CreateNewProductResponse, err error)
+	GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error)
 }
 
 type (
@@ -44,6 +45,20 @@ func (g gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProduct
 	}
 
 	allProducts, err := g.productRepo.GetAllProducts(modelProduct.CompanyId)
+	if err != nil {
+		return nil, err
+	}
+	res.Products = make([]api.Product, len(allProducts))
+	for i, p := range allProducts {
+		res.Products[i] = api.ProductSchemaToApi(p)
+	}
+	return res, nil
+}
+
+func (g gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error) {
+	res = &api.GetAllProductsResponse{}
+
+	allProducts, err := g.productRepo.GetAllProducts(companyId)
 	if err != nil {
 		return nil, err
 	}

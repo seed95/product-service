@@ -48,3 +48,7 @@ type (
 		Products []Product `json:"products"`
 	}
 )
+
+type GetAllProductsResponse struct {
+	Products []Product `json:"products"`
+}

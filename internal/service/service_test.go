@@ -93,6 +93,20 @@ func TestGateway_CreateNewProduct_CompanyZeroId(t *testing.T) {
 	require.Nil(t, res)
 }
 
+func TestGateway_GetAllProducts_Ok(t *testing.T) {
+	// Service mock
+	service := NewServiceMock(t)
+
+	CreateProduct1(service, t)
+	CreateProduct2(service, t)
+	CreateProduct3(service, t)
+
+	ctx := context.Background()
+	res, err := service.GetAllProducts(ctx, 1)
+	require.Nil(t, err)
+	require.Equal(t, 3, len(res.Products))
+}
+
 func TestProductIsValid(t *testing.T) {
 
 	tests := []struct {
