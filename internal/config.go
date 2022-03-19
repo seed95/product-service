@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/spf13/viper"
+	"time"
 )
 
 type PostgresConfig struct {
@@ -9,7 +10,8 @@ type PostgresConfig struct {
 }
 
 type Config struct {
-	ProductRepo PostgresConfig
+	ServiceTimeout time.Duration
+	ProductRepo    PostgresConfig
 }
 
 func NewConfig(prefix string) *Config {
@@ -18,6 +20,7 @@ func NewConfig(prefix string) *Config {
 	v.SetEnvPrefix(prefix)
 	v.AutomaticEnv()
 	return &Config{
+		ServiceTimeout: v.GetDuration("timeout"),
 		ProductRepo: PostgresConfig{
 			PostgresUri: v.GetString("postgres_dsn"),
 		},

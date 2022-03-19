@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package micro;
+
+option go_package = "/micro";
+
+service MicroService {
+  rpc generalCall(RequestMessage) returns (ResponseMessage) {}
+}
+
+message RequestMessage {
+  //
+  // Headers
+  //
+  string language = 2;
+  //
+  int32 opCode = 10;
+  string username = 11;
+  string companyName = 12;
+
+  //
+  // Payload
+  //
+  string payload = 51;
+}
+
+message ResponseMessage {
+  //
+  // Payload & status
+  //
+  int32 statusCode = 51;
+  string statusMessage = 52;
+  string payload = 53;
+}
