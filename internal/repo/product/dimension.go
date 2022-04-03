@@ -1,13 +1,17 @@
 package product
 
 import (
+	"fmt"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/repo/product/schema"
+	"github.com/seed95/product-service/pkg/logger"
+	"github.com/seed95/product-service/pkg/logger/keyval"
 	"gorm.io/gorm"
 )
 
 type (
 	dimensionRepo struct {
+		logger logger.Logger
 	}
 
 	DimensionService interface {
@@ -20,13 +24,21 @@ type (
 
 var _ DimensionService = (*dimensionRepo)(nil)
 
-func NewDimensionService() DimensionService {
-	return &dimensionRepo{}
+func NewDimensionService(l logger.Logger) DimensionService {
+	return &dimensionRepo{logger: l}
 }
 
 // GetDimensionsWithProductId return all dimensions for `productId`
-func (r *dimensionRepo) GetDimensionsWithProductId(db *gorm.DB, productId uint) ([]schema.Dimension, error) {
-	var dimensions []schema.Dimension
+func (r *dimensionRepo) GetDimensionsWithProductId(db *gorm.DB, productId uint) (dimensions []schema.Dimension, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+			keyval.String("dimensions", fmt.Sprintf("%+v", dimensions)),
+		}
+		logger.LogReqRes(r.logger, "dimension.GetDimensionsWithProductId", err, commonKeyVal...)
+	}()
+
 	tx := db.Order("id ASC").Model(&schema.Dimension{}).Where("product_id = ?", productId).Find(&dimensions)
 	if err := tx.Error; err != nil {
 		return nil, derror.New(derror.InternalServer, err.Error())
@@ -36,12 +48,22 @@ func (r *dimensionRepo) GetDimensionsWithProductId(db *gorm.DB, productId uint) 
 
 // InsertDimensions if a size for `productId` is duplicate, no add any dimensions
 // support roll back
-func (r *dimensionRepo) InsertDimensions(tx *gorm.DB, productId uint, sizes []string) ([]schema.Dimension, error) {
+func (r *dimensionRepo) InsertDimensions(tx *gorm.DB, productId uint, sizes []string) (dimensions []schema.Dimension, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+			keyval.String("sizes", fmt.Sprintf("%v", sizes)),
+			keyval.String("dimensions", fmt.Sprintf("%+v", dimensions)),
+		}
+		logger.LogReqRes(r.logger, "dimension.InsertDimensions", err, commonKeyVal...)
+	}()
+
 	if len(sizes) == 0 {
 		return nil, derror.InvalidDimension
 	}
 
-	dimensions := make([]schema.Dimension, len(sizes))
+	dimensions = make([]schema.Dimension, len(sizes))
 	for i, s := range sizes {
 		dimensions[i] = schema.Dimension{
 			ProductId: productId,
@@ -59,7 +81,16 @@ func (r *dimensionRepo) InsertDimensions(tx *gorm.DB, productId uint, sizes []st
 // delete dimension it finds. if a `dimensionId` not found for `productId` do nothing and delete next `dimensionId`
 // if a `dimensionId` not found return derror.DimensionNotFound
 // don't support roll back if not found a `dimensionId`
-func (r *dimensionRepo) DeleteDimensionsWithId(tx *gorm.DB, productId uint, dimensions []schema.Dimension) error {
+func (r *dimensionRepo) DeleteDimensionsWithId(tx *gorm.DB, productId uint, dimensions []schema.Dimension) (err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+			keyval.String("dimensions", fmt.Sprintf("%+v", dimensions)),
+		}
+		logger.LogReqRes(r.logger, "dimension.DeleteDimensionsWithId", err, commonKeyVal...)
+	}()
+
 	if len(dimensions) == 0 {
 		return derror.InvalidDimension
 	}
@@ -74,7 +105,17 @@ func (r *dimensionRepo) DeleteDimensionsWithId(tx *gorm.DB, productId uint, dime
 	return nil
 }
 
-func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedDimensions []schema.Dimension) ([]schema.Dimension, error) {
+func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedDimensions []schema.Dimension) (dimensions []schema.Dimension, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+			keyval.String("edited_dimensions", fmt.Sprintf("%+v", editedDimensions)),
+			keyval.String("dimensions", fmt.Sprintf("%+v", dimensions)),
+		}
+		logger.LogReqRes(r.logger, "dimension.EditDimensions", err, commonKeyVal...)
+	}()
+
 	if len(editedDimensions) == 0 {
 		return nil, derror.InvalidDimension
 	}
@@ -85,7 +126,6 @@ func (r *dimensionRepo) EditDimensions(tx *gorm.DB, productId uint, editedDimens
 	}
 
 	var deletedDimensions []schema.Dimension
-	var dimensions []schema.Dimension
 
 	// Delete dimensions
 OriginalLoop:

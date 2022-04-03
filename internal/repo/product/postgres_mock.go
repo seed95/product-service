@@ -4,6 +4,7 @@ import (
 	"github.com/seed95/product-service/internal"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo/product/schema"
+	"github.com/seed95/product-service/pkg/logger/zap"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -12,8 +13,9 @@ func NewProductRepoMock() (*productRepo, error) {
 
 	mock := productRepo{
 		config: &internal.PostgresConfig{
-			PostgresUri: "host=localhost user=seed password=seed@1400 dbname=db_test port=5432 sslmode=disable",
+			DSN: "host=localhost user=seed password=seed@1400 dbname=db_test port=5432 sslmode=disable",
 		},
+		logger: zap.NopLogger,
 	}
 
 	if err := mock.connect(); err != nil {
@@ -28,8 +30,8 @@ func NewProductRepoMock() (*productRepo, error) {
 		return nil, err
 	}
 
-	mock.theme = NewThemeService()
-	mock.dimension = NewDimensionService()
+	mock.theme = NewThemeService(mock.logger)
+	mock.dimension = NewDimensionService(mock.logger)
 
 	return &mock, nil
 }

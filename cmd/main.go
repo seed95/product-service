@@ -1,22 +1,30 @@
 package main
 
 import (
-	"github.com/seed95/product-service/internal"
-	"github.com/seed95/product-service/internal/repo/product"
+	"fmt"
 	nativeLog "log"
-	"os"
+	"net"
 )
 
 func main() {
 
-	configPrefix := os.Getenv("CONFIG_PREFIX")
-	config := internal.NewConfig(configPrefix)
-
-	productRepo, err := product.New(&product.Setting{Config: &config.ProductRepo})
+	factory, err := NewServerFactory()
 	if err != nil {
 		nativeLog.Fatal(err)
 	}
+	config := factory.Config
+	grpcServer := factory.GRPRServer
 
-	_ = productRepo
+	/* Binding gRPC Server */
+	listener, err := net.Listen("tcp", config.GRPCPort)
+	if err != nil {
+		nativeLog.Fatal("cannot create grpc server: ", err)
+	}
+
+	// running grpc server
+	fmt.Printf("Running gRPC server on port %s\n", config.GRPCPort)
+	if err := grpcServer.Serve(listener); err != nil {
+		nativeLog.Fatalf("failed ro bind gRPC server on port %s, error: %s", config.GRPCPort, err.Error())
+	}
 
 }

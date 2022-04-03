@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/seed95/product-service/internal/api"
 	"github.com/seed95/product-service/internal/repo/product"
+	"github.com/seed95/product-service/pkg/logger/zap"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -14,7 +15,7 @@ func NewServiceMock(t *testing.T) ProductService {
 	require.Nil(t, err)
 	require.NotNil(t, pRepo)
 
-	service, err := New(&Setting{ProductRepo: pRepo})
+	service, err := New(&Setting{ProductRepo: pRepo, Logger: zap.NopLogger})
 	require.Nil(t, err)
 	require.NotNil(t, service)
 	return service

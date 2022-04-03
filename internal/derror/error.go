@@ -3,91 +3,87 @@ package derror
 import (
 	"errors"
 	"fmt"
-	"net/http"
+	"google.golang.org/grpc/codes"
 )
 
 type serviceError struct {
 	message string
-	code    int
+	code    codes.Code
 	desc    string
 }
 
 var _ error = (*serviceError)(nil)
 
-//452-499, 512-599 Unassigned
-const (
-	StatusUnknown = 552 // Unknown error
-)
-
 // Service error instances
 var (
 	Timeout = serviceError{
 		message: "time_out",
-		code:    http.StatusRequestTimeout,
+		code:    codes.ResourceExhausted,
 	}
 	AccessDenied = serviceError{
 		message: "access_denied",
-		code:    http.StatusBadRequest,
+		code:    codes.Unauthenticated,
 	}
 	NotImplemented = serviceError{
 		message: "not_implemented",
-		code:    http.StatusNotImplemented,
+		code:    codes.Unimplemented,
 	}
 	TooManyRequests = serviceError{
 		message: "too_many_requests",
-		code:    http.StatusTooManyRequests,
+		code:    codes.Unavailable,
 	}
 	BadRequest = serviceError{
 		message: "bad_request",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 	InternalServer = serviceError{
 		message: "internal_server",
-		code:    http.StatusInternalServerError,
+		code:    codes.Internal,
 	}
 	Unknown = serviceError{
 		message: "unknown_error",
-		code:    StatusUnknown,
+		code:    codes.Unknown,
 	}
 
 	ProductNotFound = serviceError{
 		message: "product_not_found",
-		code:    http.StatusBadRequest,
+		code:    codes.NotFound,
 	}
 	ThemeNotFound = serviceError{
 		message: "theme_not_found",
-		code:    http.StatusBadRequest,
+		code:    codes.NotFound,
 	}
 	DimensionNotFound = serviceError{
 		message: "dimension_not_found",
-		code:    http.StatusBadRequest,
+		code:    codes.NotFound,
 	}
 
 	InvalidColor = serviceError{
 		message: "invalid_color",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 	InvalidTheme = serviceError{
 		message: "invalid_theme",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 	InvalidDimension = serviceError{
 		message: "invalid_dimension",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 	InvalidProduct = serviceError{
 		message: "invalid_product",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 	InvalidCompany = serviceError{
 		message: "invalid_company",
-		code:    http.StatusBadRequest,
+		code:    codes.InvalidArgument,
 	}
 )
 
 // Create error message formats
 var (
 	CreateProductRepoErrorFormat = "[ERROR] failed to create product repo, error: %v\n"
+	CreateStdLogErrorFormat      = "[ERROR] failed to create std log instance, error: %v\n"
 )
 
 func (se *serviceError) SetDesc(desc string) {
@@ -113,9 +109,9 @@ func (se serviceError) Error() string {
 func StatusCode(err error) int {
 	ce := serviceError{}
 	if errors.As(err, &ce) {
-		return ce.code
+		return int(ce.code)
 	}
-	return http.StatusInternalServerError
+	return int(Unknown.code)
 }
 
 func StatusText(err error) string {

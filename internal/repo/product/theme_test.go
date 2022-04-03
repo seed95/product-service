@@ -4,13 +4,14 @@ import (
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo/product/schema"
+	"github.com/seed95/product-service/pkg/logger/zap"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
 )
 
 func NewThemeRepoMock() ThemeService {
-	return NewThemeService()
+	return NewThemeService(zap.NopLogger)
 }
 
 func TestThemeRepo_GetThemesWithProductId_Ok(t *testing.T) {

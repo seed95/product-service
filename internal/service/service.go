@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/seed95/product-service/internal/api"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo"
+	"github.com/seed95/product-service/pkg/logger"
+	"github.com/seed95/product-service/pkg/logger/keyval"
 	"github.com/seed95/product-service/pkg/unique"
 )
 
@@ -20,21 +23,32 @@ type ProductService interface {
 type (
 	gateway struct {
 		product repo.ProductRepo
+		logger  logger.Logger
 	}
 
 	Setting struct {
 		ProductRepo repo.ProductRepo
+		Logger      logger.Logger
 	}
 )
 
 var _ ProductService = (*gateway)(nil)
 
 func New(s *Setting) (ProductService, error) {
-	return &gateway{product: s.ProductRepo}, nil
+	return &gateway{product: s.ProductRepo, logger: s.Logger}, nil
 
 }
 
 func (g *gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("req", fmt.Sprintf("%+v", req)),
+			keyval.String("res", fmt.Sprintf("%+v", res)),
+		}
+		logger.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
+	}()
+
 	modelProduct := api.ProductApiToModel(*req.NewProduct)
 	if !productIsValid(*modelProduct) || modelProduct.Id != 0 {
 		return nil, derror.InvalidProduct
@@ -49,6 +63,15 @@ func (g *gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProduc
 }
 
 func (g *gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("company_id", fmt.Sprintf("%v", companyId)),
+			keyval.String("res", fmt.Sprintf("%+v", res)),
+		}
+		logger.LogReqRes(g.logger, "service.GetAllProducts", err, commonKeyVal...)
+	}()
+
 	if companyId == 0 {
 		return nil, derror.InvalidCompany
 	}
@@ -67,6 +90,15 @@ func (g *gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.
 }
 
 func (g *gateway) GetProductWithId(ctx context.Context, productId uint) (res *api.GetProductResponse, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+			keyval.String("res", fmt.Sprintf("%+v", res)),
+		}
+		logger.LogReqRes(g.logger, "service.GetProductWithId", err, commonKeyVal...)
+	}()
+
 	if productId == 0 {
 		return nil, derror.InvalidProduct
 	}
@@ -82,6 +114,14 @@ func (g *gateway) GetProductWithId(ctx context.Context, productId uint) (res *ap
 }
 
 func (g *gateway) DeleteProduct(ctx context.Context, productId uint) (err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("product_id", fmt.Sprintf("%v", productId)),
+		}
+		logger.LogReqRes(g.logger, "service.DeleteProduct", err, commonKeyVal...)
+	}()
+
 	if productId == 0 {
 		return derror.InvalidProduct
 	}
@@ -89,6 +129,15 @@ func (g *gateway) DeleteProduct(ctx context.Context, productId uint) (err error)
 }
 
 func (g *gateway) EditProduct(ctx context.Context, req *api.EditProductRequest) (res *api.EditProductResponse, err error) {
+	// Log request response
+	defer func() {
+		commonKeyVal := []keyval.Pair{
+			keyval.String("req", fmt.Sprintf("%+v", req)),
+			keyval.String("res", fmt.Sprintf("%+v", res)),
+		}
+		logger.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
+	}()
+
 	modelProduct := api.ProductApiToModel(*req.EditedProduct)
 	if !productIsValid(*modelProduct) || modelProduct.Id == 0 {
 		return nil, derror.InvalidProduct

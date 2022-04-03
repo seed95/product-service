@@ -4,13 +4,14 @@ import (
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo/product/schema"
+	"github.com/seed95/product-service/pkg/logger/zap"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
 )
 
 func NewDimensionRepoMock() DimensionService {
-	return NewDimensionService()
+	return NewDimensionService(zap.NopLogger)
 }
 
 func TestDimensionRepo_GetDimensionsWithProductId_Ok(t *testing.T) {
