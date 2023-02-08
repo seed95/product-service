@@ -42,7 +42,7 @@ func ProductSchemaToApi(p schema.Product) *Product {
 type (
 	CreateNewProductRequest struct {
 		*Common
-		NewProduct *Product `json:"new_product"`
+		Product
 	}
 
 	CreateNewProductResponse struct {
@@ -56,14 +56,14 @@ type GetAllProductsResponse struct {
 
 type (
 	EditProductRequest struct {
-		EditedProduct *Product `json:"edited_product"`
+		Product
 	}
 
 	EditProductResponse struct {
-		NewProduct *Product `json:"new_product"`
+		Product
 	}
 )
 
 type GetProductResponse struct {
-	Product *Product `json:"product"`
+	Product
 }

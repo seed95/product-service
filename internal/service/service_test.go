@@ -15,7 +15,7 @@ func TestGateway_CreateNewProduct_Ok(t *testing.T) {
 	service := NewServiceMock(t)
 
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct1()}
+	req := api.CreateNewProductRequest{Product: GetProduct1()}
 
 	res, err := service.CreateNewProduct(ctx, &req)
 	require.Nil(t, err)
@@ -30,7 +30,7 @@ func TestGateway_CreateNewProduct_Empty(t *testing.T) {
 	t.Run("design code", func(t *testing.T) {
 		p1 := GetProduct1()
 		p1.DesignCode = ""
-		req := api.CreateNewProductRequest{NewProduct: p1}
+		req := api.CreateNewProductRequest{Product: p1}
 
 		res, err := service.CreateNewProduct(ctx, &req)
 		require.Equal(t, derror.InvalidProduct, err)
@@ -40,7 +40,7 @@ func TestGateway_CreateNewProduct_Empty(t *testing.T) {
 	t.Run("color", func(t *testing.T) {
 		p1 := GetProduct1()
 		p1.Colors = []string{}
-		req := api.CreateNewProductRequest{NewProduct: p1}
+		req := api.CreateNewProductRequest{Product: p1}
 
 		res, err := service.CreateNewProduct(ctx, &req)
 		require.Equal(t, derror.InvalidProduct, err)
@@ -50,7 +50,7 @@ func TestGateway_CreateNewProduct_Empty(t *testing.T) {
 	t.Run("size", func(t *testing.T) {
 		p1 := GetProduct1()
 		p1.Sizes = []string{}
-		req := api.CreateNewProductRequest{NewProduct: p1}
+		req := api.CreateNewProductRequest{Product: p1}
 
 		res, err := service.CreateNewProduct(ctx, &req)
 		require.Equal(t, derror.InvalidProduct, err)
@@ -60,7 +60,7 @@ func TestGateway_CreateNewProduct_Empty(t *testing.T) {
 	t.Run("description", func(t *testing.T) {
 		p1 := GetProduct1()
 		p1.Description = ""
-		req := api.CreateNewProductRequest{NewProduct: p1}
+		req := api.CreateNewProductRequest{Product: p1}
 
 		res, err := service.CreateNewProduct(ctx, &req)
 		require.Nil(t, err)
@@ -73,8 +73,8 @@ func TestGateway_CreateNewProduct_NonZeroId(t *testing.T) {
 	service := NewServiceMock(t)
 
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct1()}
-	req.NewProduct.Id = 10
+	req := api.CreateNewProductRequest{Product: GetProduct1()}
+	req.Product.Id = 10
 
 	res, err := service.CreateNewProduct(ctx, &req)
 	require.Equal(t, derror.InvalidProduct, err)
@@ -86,8 +86,8 @@ func TestGateway_CreateNewProduct_CompanyZeroId(t *testing.T) {
 	service := NewServiceMock(t)
 
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct1()}
-	req.NewProduct.CompanyId = 0
+	req := api.CreateNewProductRequest{Product: GetProduct1()}
+	req.Product.CompanyId = 0
 
 	res, err := service.CreateNewProduct(ctx, &req)
 	require.Equal(t, derror.InvalidProduct, err)
@@ -253,7 +253,7 @@ func TestGateway_EditProduct_Ok(t *testing.T) {
 
 	t.Run("description", func(t *testing.T) {
 		p1.Description = "عوض شدن توضیحات"
-		req := &api.EditProductRequest{EditedProduct: p1}
+		req := &api.EditProductRequest{Product: p1}
 
 		res, err := service.EditProduct(ctx, req)
 		require.Nil(t, err)
@@ -266,7 +266,7 @@ func TestGateway_EditProduct_Ok(t *testing.T) {
 
 	t.Run("design code", func(t *testing.T) {
 		p1.DesignCode = "106"
-		req := &api.EditProductRequest{EditedProduct: p1}
+		req := &api.EditProductRequest{Product: p1}
 
 		res, err := service.EditProduct(ctx, req)
 		require.Nil(t, err)
@@ -279,7 +279,7 @@ func TestGateway_EditProduct_Ok(t *testing.T) {
 
 	t.Run("size", func(t *testing.T) {
 		p1.Sizes = []string{"12", "8"}
-		req := &api.EditProductRequest{EditedProduct: p1}
+		req := &api.EditProductRequest{Product: p1}
 
 		res, err := service.EditProduct(ctx, req)
 		require.Nil(t, err)
@@ -292,7 +292,7 @@ func TestGateway_EditProduct_Ok(t *testing.T) {
 
 	t.Run("color", func(t *testing.T) {
 		p1.Colors = []string{"آبی", "صورتی"}
-		req := &api.EditProductRequest{EditedProduct: p1}
+		req := &api.EditProductRequest{Product: p1}
 
 		res, err := service.EditProduct(ctx, req)
 		require.Nil(t, err)
@@ -319,7 +319,7 @@ func TestGateway_EditProduct_NotChange(t *testing.T) {
 	p1.Id = gotP1.ID
 
 	ctx := context.Background()
-	req := &api.EditProductRequest{EditedProduct: p1}
+	req := &api.EditProductRequest{Product: p1}
 
 	res, err := service.EditProduct(ctx, req)
 	require.Nil(t, err)
@@ -344,7 +344,7 @@ func TestGateway_EditProduct_ProductNotExist(t *testing.T) {
 	p1.Id = gotP1.ID + 100
 
 	ctx := context.Background()
-	req := &api.EditProductRequest{EditedProduct: p1}
+	req := &api.EditProductRequest{Product: p1}
 
 	res, err := service.EditProduct(ctx, req)
 	require.Equal(t, derror.ProductNotFound, err)

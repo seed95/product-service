@@ -15,13 +15,12 @@ func main() {
 	config := factory.Config
 	grpcServer := factory.GRPRServer
 
-	/* Binding gRPC Server */
+	// Running gRPC Server
 	listener, err := net.Listen("tcp", config.GRPCPort)
 	if err != nil {
 		nativeLog.Fatal("cannot create grpc server: ", err)
 	}
 
-	// running grpc server
 	fmt.Printf("Running gRPC server on port %s\n", config.GRPCPort)
 	if err := grpcServer.Serve(listener); err != nil {
 		nativeLog.Fatalf("failed ro bind gRPC server on port %s, error: %s", config.GRPCPort, err.Error())

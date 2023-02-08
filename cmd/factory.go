@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/handler"
-	"github.com/seed95/product-service/pkg/proto/micro"
 	"google.golang.org/grpc"
 	nativeLog "log"
 	"os"
@@ -47,8 +46,7 @@ func NewServerFactory() (*ServerFactory, error) {
 		return nil, err
 	}
 
-	grpcServer := grpc.NewServer()
-	gRPCHandler, err := handler.New(&handler.Setting{
+	grpcServer, err := handler.New(&handler.Setting{
 		Config:  config,
 		Service: productService,
 		Logger:  zapLogger,
@@ -56,7 +54,8 @@ func NewServerFactory() (*ServerFactory, error) {
 	if err != nil {
 		nativeLog.Fatal(err)
 	}
-	micro.RegisterMicroServiceServer(grpcServer, gRPCHandler)
+	//grpcServer := grpc.NewServer(grpc.UnaryInterceptor(inteceptor))
+	//micro.RegisterMicroServiceServer(grpcServer, gRPCHandler)
 
 	return &ServerFactory{
 		Config:     config,

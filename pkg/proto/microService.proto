@@ -13,10 +13,11 @@ message RequestMessage {
   // Headers
   //
   string language = 2;
-  //
+  // Common
   int32 opCode = 10;
   string username = 11;
-  string companyName = 12;
+  int64 companyId = 12;
+  string companyName = 13;
 
   //
   // Payload

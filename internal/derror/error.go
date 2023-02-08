@@ -30,7 +30,7 @@ var (
 	}
 	TooManyRequests = serviceError{
 		message: "too_many_requests",
-		code:    codes.Unavailable,
+		code:    codes.ResourceExhausted,
 	}
 	BadRequest = serviceError{
 		message: "bad_request",

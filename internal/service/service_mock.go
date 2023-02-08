@@ -21,8 +21,8 @@ func NewServiceMock(t *testing.T) ProductService {
 	return service
 }
 
-func GetProduct1() *api.Product {
-	return &api.Product{
+func GetProduct1() api.Product {
+	return api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "105",
@@ -32,8 +32,8 @@ func GetProduct1() *api.Product {
 	}
 }
 
-func GetProduct2() *api.Product {
-	return &api.Product{
+func GetProduct2() api.Product {
+	return api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "106",
@@ -43,8 +43,8 @@ func GetProduct2() *api.Product {
 	}
 }
 
-func GetProduct3() *api.Product {
-	return &api.Product{
+func GetProduct3() api.Product {
+	return api.Product{
 		CompanyId:   1,
 		CompanyName: "Negin",
 		DesignCode:  "107",
@@ -56,24 +56,24 @@ func GetProduct3() *api.Product {
 
 func CreateProduct1(service ProductService, t *testing.T) {
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct1()}
+	req := api.CreateNewProductRequest{Product: GetProduct1()}
 
-	_, err := service.CreateNewProduct(ctx, &req)
+	_, err := service.CreateNewProduct(ctx, req)
 	require.Nil(t, err)
 }
 
 func CreateProduct2(service ProductService, t *testing.T) {
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct2()}
+	req := api.CreateNewProductRequest{Product: GetProduct2()}
 
-	_, err := service.CreateNewProduct(ctx, &req)
+	_, err := service.CreateNewProduct(ctx, req)
 	require.Nil(t, err)
 }
 
 func CreateProduct3(service ProductService, t *testing.T) {
 	ctx := context.Background()
-	req := api.CreateNewProductRequest{NewProduct: GetProduct3()}
+	req := api.CreateNewProductRequest{Product: GetProduct3()}
 
-	_, err := service.CreateNewProduct(ctx, &req)
+	_, err := service.CreateNewProduct(ctx, req)
 	require.Nil(t, err)
 }

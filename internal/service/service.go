@@ -7,13 +7,13 @@ import (
 	"github.com/seed95/product-service/internal/derror"
 	"github.com/seed95/product-service/internal/model"
 	"github.com/seed95/product-service/internal/repo"
-	"github.com/seed95/product-service/pkg/logger"
+	kitlog "github.com/seed95/product-service/pkg/logger"
 	"github.com/seed95/product-service/pkg/logger/keyval"
 	"github.com/seed95/product-service/pkg/unique"
 )
 
 type ProductService interface {
-	CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error)
+	CreateNewProduct(ctx context.Context, req api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error)
 	GetAllProducts(ctx context.Context, companyId uint) (res *api.GetAllProductsResponse, err error)
 	GetProductWithId(ctx context.Context, productId uint) (res *api.GetProductResponse, err error)
 	DeleteProduct(ctx context.Context, productId uint) (err error)
@@ -23,12 +23,12 @@ type ProductService interface {
 type (
 	gateway struct {
 		product repo.ProductRepo
-		logger  logger.Logger
+		logger  kitlog.Logger
 	}
 
 	Setting struct {
 		ProductRepo repo.ProductRepo
-		Logger      logger.Logger
+		Logger      kitlog.Logger
 	}
 )
 
@@ -39,19 +39,23 @@ func New(s *Setting) (ProductService, error) {
 
 }
 
-func (g *gateway) CreateNewProduct(ctx context.Context, req *api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error) {
+func (g *gateway) CreateNewProduct(ctx context.Context, req api.CreateNewProductRequest) (res *api.GetAllProductsResponse, err error) {
 	// Log request response
 	defer func() {
 		commonKeyVal := []keyval.Pair{
-			keyval.String("req", fmt.Sprintf("%+v", req)),
+			keyval.String("req.Product", fmt.Sprintf("%+v", req.Product)),
 			keyval.String("res", fmt.Sprintf("%+v", res)),
 		}
-		logger.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
+		kitlog.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
 	}()
 
-	modelProduct := api.ProductApiToModel(*req.NewProduct)
-	if !productIsValid(*modelProduct) || modelProduct.Id != 0 {
-		return nil, derror.InvalidProduct
+	modelProduct := api.ProductApiToModel(req.Product)
+	if err := productIsValid(*modelProduct); err != nil {
+		return nil, err
+	}
+
+	if modelProduct.Id != 0 {
+		return nil, derror.New(derror.InvalidProduct, "invalid product id")
 	}
 
 	_, err = g.product.CreateProduct(*modelProduct)
@@ -69,7 +73,7 @@ func (g *gateway) GetAllProducts(ctx context.Context, companyId uint) (res *api.
 			keyval.String("company_id", fmt.Sprintf("%v", companyId)),
 			keyval.String("res", fmt.Sprintf("%+v", res)),
 		}
-		logger.LogReqRes(g.logger, "service.GetAllProducts", err, commonKeyVal...)
+		kitlog.LogReqRes(g.logger, "service.GetAllProducts", err, commonKeyVal...)
 	}()
 
 	if companyId == 0 {
@@ -96,7 +100,7 @@ func (g *gateway) GetProductWithId(ctx context.Context, productId uint) (res *ap
 			keyval.String("product_id", fmt.Sprintf("%v", productId)),
 			keyval.String("res", fmt.Sprintf("%+v", res)),
 		}
-		logger.LogReqRes(g.logger, "service.GetProductWithId", err, commonKeyVal...)
+		kitlog.LogReqRes(g.logger, "service.GetProductWithId", err, commonKeyVal...)
 	}()
 
 	if productId == 0 {
@@ -109,7 +113,7 @@ func (g *gateway) GetProductWithId(ctx context.Context, productId uint) (res *ap
 	}
 
 	res = &api.GetProductResponse{}
-	res.Product = api.ProductSchemaToApi(*schemaProduct)
+	res.Product = *api.ProductSchemaToApi(*schemaProduct)
 	return res, nil
 }
 
@@ -119,7 +123,7 @@ func (g *gateway) DeleteProduct(ctx context.Context, productId uint) (err error)
 		commonKeyVal := []keyval.Pair{
 			keyval.String("product_id", fmt.Sprintf("%v", productId)),
 		}
-		logger.LogReqRes(g.logger, "service.DeleteProduct", err, commonKeyVal...)
+		kitlog.LogReqRes(g.logger, "service.DeleteProduct", err, commonKeyVal...)
 	}()
 
 	if productId == 0 {
@@ -135,12 +139,16 @@ func (g *gateway) EditProduct(ctx context.Context, req *api.EditProductRequest) 
 			keyval.String("req", fmt.Sprintf("%+v", req)),
 			keyval.String("res", fmt.Sprintf("%+v", res)),
 		}
-		logger.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
+		kitlog.LogReqRes(g.logger, "service.CreateNewProduct", err, commonKeyVal...)
 	}()
 
-	modelProduct := api.ProductApiToModel(*req.EditedProduct)
-	if !productIsValid(*modelProduct) || modelProduct.Id == 0 {
-		return nil, derror.InvalidProduct
+	modelProduct := api.ProductApiToModel(req.Product)
+	if err := productIsValid(*modelProduct); err != nil {
+		return nil, err
+	}
+
+	if modelProduct.Id == 0 {
+		return nil, derror.New(derror.InvalidProduct, "invalid product id")
 	}
 
 	editedProduct, err := g.product.EditProduct(*modelProduct)
@@ -149,34 +157,53 @@ func (g *gateway) EditProduct(ctx context.Context, req *api.EditProductRequest) 
 	}
 
 	res = &api.EditProductResponse{}
-	res.NewProduct = api.ProductSchemaToApi(*editedProduct)
+	res.Product = *api.ProductSchemaToApi(*editedProduct)
 	return res, nil
 }
 
-func productIsValid(p model.Product) bool {
+func productIsValid(p model.Product) error {
+
+	// Check empty color
+	if len(p.Colors) == 0 {
+		return derror.New(derror.InvalidProduct, "empty color")
+	}
+
 	// Check empty color
 	for _, c := range p.Colors {
 		if c == "" {
-			return false
+			return derror.New(derror.InvalidProduct, "empty color")
 		}
+	}
+
+	// Check empty size
+	if len(p.Sizes) == 0 {
+		return derror.New(derror.InvalidProduct, "empty size")
 	}
 
 	// Check empty size
 	for _, s := range p.Sizes {
 		if s == "" {
-			return false
+			return derror.New(derror.InvalidProduct, "empty size")
 		}
 	}
 
 	// Check unique color
 	if !unique.StringsAreUnique(p.Colors) {
-		return false
+		return derror.New(derror.InvalidProduct, "not unique color")
 	}
 
 	// Check unique size
 	if !unique.StringsAreUnique(p.Sizes) {
-		return false
+		return derror.New(derror.InvalidProduct, "not unique size")
 	}
 
-	return p.DesignCode != "" && len(p.Colors) != 0 && len(p.Sizes) != 0 && p.CompanyId != 0
+	if p.DesignCode != "" {
+		return derror.New(derror.InvalidProduct, "empty design code")
+	}
+
+	if p.CompanyId != 0 {
+		return derror.New(derror.InvalidProduct, "invalid company id")
+	}
+
+	return nil
 }
